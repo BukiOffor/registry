@@ -1,5 +1,36 @@
-//! # Concordium V1 Smart Contract Template
-
+//! A registry for smart contract wallets.
+//!
+//! This contract aims to define a standard that can be used
+//! to query cis5-wallet standard applicaations. The cis5 wallet
+//! account systems makes use of a [PublicKeyEd25519] key. This key
+//! can be used to deposit and transfer native and token assets on the network.  
+//!
+//! The overhead of this standard is that users can implement this protocol
+//! on various smart contract and there will be no way for these contracts
+//! to communicated with each other `yet`. Also the [PublicKeyEd25519] is
+//! in an unreadable format and is prone to human error.
+//!
+//! The contract therefore creates an interface that allows owners of
+//! [PublicKeyEd25519] to create a human readable tag for it's public key.
+//! This tag will be used to create a object in the contract state that maps to
+//! [Registry]. This [Registry] will contain the :
+//! - *public_key*: the public key of the user
+//! - *contract_address*: the smart wallet contract address that the key opearates on
+//! - *provider*: this is a company or an app that manages the contract
+//! The tags at the point of persisting will append a `.ccd` string to the tags,creating
+//! a unique and deterministic sequence of tags.
+//!
+//! The two actions in the smart contract that can be taken are:
+//! - *register*: creates a string tag for a given public key
+//! - *getTag*: gets the metadata of a tag.
+//!
+//! The goal of this standard is to simplify the transfer of assets between accounts and
+//! chaperone accounts on the concordium network. Third party wallet providers that supports
+//! transfers to cis5-wallet standard can match a string sequence for `.ccd`.
+//! if present they can query the registry for the account details without having
+//! to ask a user to manually fill in all the fields.
+//! While wallets that do not support the standard yet, can easily support it.
+//!
 #![cfg_attr(not(feature = "std"), no_std)]
 pub mod errors;
 pub mod types;
@@ -36,7 +67,6 @@ impl State {
         }
     }
 
-    
     fn get(&self, tag: String) -> RegistryResult<Registry> {
         self.registry
             .get(&tag)
@@ -159,13 +189,7 @@ fn withdraw_ccd(
         data,
     } = message.clone();
     // Validate the signature and increase the nonce.
-    validate_signature_and_increase_nonce(
-        &message,
-        signer,
-        signature,
-        crypto_primitives,
-        ctx,
-    )?;
+    validate_signature_and_increase_nonce(&message, signer, signature, crypto_primitives, ctx)?;
     if !tag.ends_with(".ccd") {
         tag.push_str(".ccd");
     }
@@ -194,7 +218,9 @@ fn withdraw_ccd(
 )]
 fn get_tag(ctx: &ReceiveContext, host: &mut Host<State>) -> RegistryResult<Registry> {
     let mut tag: String = ctx.parameter_cursor().get()?;
-    if !tag.ends_with(".ccd"){ tag.push_str(".ccd"); }
+    if !tag.ends_with(".ccd") {
+        tag.push_str(".ccd");
+    }
     host.state.get(tag)
 }
 
