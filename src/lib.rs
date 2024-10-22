@@ -138,7 +138,7 @@ fn validate_signature_and_increase_nonce<T: Serial + IsMessage>(
 }
 
 /// Creates a new instance of the smart contract.
-#[init(contract = "registry", parameter = "CustomInputParameter")]
+#[init(contract = "registry")]
 fn init(_ctx: &InitContext, state_builder: &mut StateBuilder) -> InitResult<State> {
     // Create the initial state of the smart contract here.
     // This state can then be used in the other functions.
@@ -214,18 +214,11 @@ fn withdraw_ccd(
     name = "getTag",
     parameter = "String",
     error = "Error",
-    mutable
 )]
-fn get_tag(ctx: &ReceiveContext, host: &mut Host<State>) -> RegistryResult<Registry> {
+fn get_tag(ctx: &ReceiveContext, host: &Host<State>) -> RegistryResult<Registry> {
     let mut tag: String = ctx.parameter_cursor().get()?;
     if !tag.ends_with(".ccd") {
         tag.push_str(".ccd");
     }
     host.state.get(tag)
-}
-
-/// Returns the state of the smart contract.
-#[receive(contract = "registry", name = "view", return_value = "State")]
-fn view<'a>(_ctx: &ReceiveContext, host: &'a Host<State>) -> ReceiveResult<&'a State> {
-    Ok(host.state())
 }
