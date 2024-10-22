@@ -20,9 +20,16 @@
 //! The tags at the point of persisting will append a `.ccd` string to the tags,creating
 //! a unique and deterministic sequence of tags.
 //!
-//! The two actions in the smart contract that can be taken are:
+//! The three actions in the smart contract that can be taken are:
 //! - *register*: creates a string tag for a given public key
-//! - *getTag*: gets the metadata of a tag.
+//! - *get_key*: gets the account details of a key given a tag.
+//! - *get_tag*: does a reverse lookup and gets the tag when given a key.
+//! 
+//! By design the contract exposes only these 3 entry points. A given public key can 
+//! only have 1 tag for a lifetime. This means that a key cannot be moved 
+//! from one smart contract wallet to another once registered.
+//! Note that the cis5 wallet standard does not aim to replace the account system 
+//! on the network but instead a way to quickly onboard users.
 //!
 //! The goal of this standard is to simplify the transfer of assets between accounts and
 //! chaperone accounts on the concordium network. Third party wallet providers that supports
@@ -54,14 +61,22 @@ pub struct State<S = StateApi> {
     // Add fields to this type to hold state in the smart contract.
     // This field is just an example.
     registry: StateMap<String, Registry, S>,
+    lookup: StateMap<PublicKeyEd25519, String, S>,
 }
 
 impl State {
     fn register(&mut self, tag: String, data: Registry) -> RegistryResult<()> {
-        match self.registry.entry(tag) {
+        let Registry { public_key, contract_address: _, provider:_ } = data.clone();    
+        match self.registry.entry(tag.clone()) {
+            // check if the tag has been created before.
             Entry::Occupied(_) => Err(Error::TagAlreadyExists),
             Entry::Vacant(entry) => {
+                // check if the public key has created a tag for this key before.
+                if self.lookup.get(&public_key).is_some() {
+                    return Err(Error::TagAlreadyExists);
+                }
                 entry.insert(data);
+                let _ = self.lookup.insert(public_key, tag);
                 Ok(())
             }
         }
@@ -72,6 +87,13 @@ impl State {
             .get(&tag)
             .map(|r| r.clone())
             .ok_or(Error::TagDoesNotExist)
+    }
+
+    fn get_tag(&self, key: PublicKeyEd25519) -> RegistryResult<String> {
+        self.lookup
+            .get(&key)
+            .map(|r| r.clone())
+            .ok_or(Error::KeyDoesNotExist)
     }
 }
 
@@ -144,6 +166,7 @@ fn init(_ctx: &InitContext, state_builder: &mut StateBuilder) -> InitResult<Stat
     // This state can then be used in the other functions.
     Ok(State {
         registry: state_builder.new_map(),
+        lookup: state_builder.new_map(),
     })
 }
 
@@ -211,14 +234,27 @@ fn withdraw_ccd(
 /// The input parameter in this function is a `String`.
 #[receive(
     contract = "registry",
-    name = "getTag",
+    name = "get_key",
     parameter = "String",
     error = "Error",
 )]
-fn get_tag(ctx: &ReceiveContext, host: &Host<State>) -> RegistryResult<Registry> {
+fn get_key(ctx: &ReceiveContext, host: &Host<State>) -> RegistryResult<Registry> {
     let mut tag: String = ctx.parameter_cursor().get()?;
     if !tag.ends_with(".ccd") {
         tag.push_str(".ccd");
     }
     host.state.get(tag)
+}
+
+/// Get's the registered tag for a user.
+/// The input parameter in this function is a `String`.
+#[receive(
+    contract = "registry",
+    name = "get_tag",
+    parameter = "PublicKeyEd25519",
+    error = "Error",
+)]
+fn get_tag(ctx: &ReceiveContext, host: &Host<State>) -> RegistryResult<String> {
+    let key: PublicKeyEd25519 = ctx.parameter_cursor().get()?;
+    host.state.get_tag(key)
 }

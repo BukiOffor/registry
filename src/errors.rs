@@ -21,4 +21,5 @@ pub enum Error {
     /// Failed because
     TagAlreadyExists, // -8
     TagDoesNotExist, // -9
+    KeyDoesNotExist, // -10
 }
