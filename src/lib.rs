@@ -5,6 +5,7 @@ pub mod errors;
 pub mod types;
 use crate::errors::*;
 use crate::types::*;
+use concordium_std::cmp::Ordering;
 use concordium_std::*;
 use core::fmt::Debug;
 
@@ -27,18 +28,16 @@ pub struct State<S = StateApi> {
 
 impl State {
     fn register(&mut self, tag: String, data: Registry) -> RegistryResult<()> {
-        if self.exists(&tag) {
-            Err(Error::TagAlreadyExists)
-        } else {
-            self.registry.entry(tag).or_insert(data);
-            Ok(())
+        match self.registry.entry(tag) {
+            Entry::Occupied(_) => Err(Error::TagAlreadyExists),
+            Entry::Vacant(entry) => {
+                entry.insert(data);
+                Ok(())
+            }
         }
     }
 
-    fn exists(&mut self, tag: &String) -> bool {
-        self.registry.get(tag).is_some()
-    }
-
+    
     fn get(&self, tag: String) -> RegistryResult<Registry> {
         self.registry
             .get(&tag)
@@ -52,12 +51,9 @@ impl State {
 #[concordium(repr(u8))]
 pub enum Event {
     /// The event tracks the nonce used in the message that was signed.
-    #[concordium(tag = 250)]
+    #[concordium(tag = 28)]
     Register(RegisterEvent),
-    
 }
-
-
 
 /// Calculates the message hash from the message bytes.
 /// It prepends the message bytes with a context string consisting of the
@@ -137,8 +133,9 @@ fn init(_ctx: &InitContext, state_builder: &mut StateBuilder) -> InitResult<Stat
     })
 }
 
-/// The function adds a new tag to the registry
-/// The function logs `Register` event
+/// The function adds a new tag to the registry.
+/// it first tries to validate the signed transactions before attempting to execute.
+/// logs the `Register` event
 ///
 /// It rejects if:
 /// - it fails to parse the parameter.
@@ -168,14 +165,17 @@ fn withdraw_ccd(
         signature,
         message,
     } = param;
-
+    ensure!(
+        signer.cmp(&message.data.public_key) == Ordering::Equal,
+        Error::WrongSignature.into()
+    );
     let RegisterParam {
         expiry_time: _,
-        nonce,
-        tag,
+        nonce: _,
+        mut tag,
         data,
     } = message.clone();
-
+    // Validate the signature and increase the nonce.
     validate_signature_and_increase_nonce(
         &message,
         signer,
@@ -184,44 +184,36 @@ fn withdraw_ccd(
         crypto_primitives,
         ctx,
     )?;
-
-    // Transfer service fee
+    if !tag.ends_with(".ccd") {
+        tag.push_str(".ccd");
+    }
+    // Register tag on chain
     host.state_mut().register(tag, data)?;
 
     logger.log(&Event::Register(RegisterEvent {
         tag: message.tag,
         contract_address: message.data.contract_address,
-        public_key:       message.data.public_key,
-        provider:         message.data.provider,
-        registrar: ctx.sender()
+        public_key: message.data.public_key,
+        provider: message.data.provider,
+        registrar: ctx.sender(),
     }))?;
 
     Ok(())
 }
 
-/// Receive function. The input parameter in this function is the boolean variable `return_error`.
-///  If `return_error == true`, the receive function will return a custom error.
-///  If `return_error == false`, the receive function executes successfully.
+/// Get's the registered tag for a user.
+/// The input parameter in this function is a `String`.
 #[receive(
     contract = "registry",
-    name = "receive",
-    // You can use any other type than bool here, bool is used here only as an example.
-    parameter = "bool",
+    name = "getTag",
+    parameter = "String",
     error = "Error",
     mutable
 )]
-fn receive(ctx: &ReceiveContext, _host: &mut Host<State>) -> RegistryResult<()> {
-    // Parse input and apply any other logic relevant for this function of the smart contract.
-    // You can mutate the smart contract state here via host.state_mut(), since the receive attribute has the mutable flag.
-    // You can return any of your custom error variants from above.
-
-    // Returns ParseError on failure.
-    let return_error = ctx.parameter_cursor().get()?;
-    if return_error {
-        Err(Error::UnAuthorized)
-    } else {
-        Ok(())
-    }
+fn get_tag(ctx: &ReceiveContext, host: &mut Host<State>) -> RegistryResult<Registry> {
+    let mut tag: String = ctx.parameter_cursor().get()?;
+    if !tag.ends_with(".ccd"){ tag.push_str(".ccd"); }
+    host.state.get(tag)
 }
 
 /// Returns the state of the smart contract.

@@ -82,8 +82,6 @@ fn initialize() -> (Chain, ContractInitSuccess) {
         .module_deploy_v1(SIGNER, ALICE, module)
         .expect("Deploy valid module");
 
-    let parameter = CustomInputParameter { num: 0 };
-
     // Initialize the contract.
     let init = chain
         .contract_init(
@@ -94,7 +92,7 @@ fn initialize() -> (Chain, ContractInitSuccess) {
                 amount: Amount::zero(),
                 mod_ref: deployment.module_reference,
                 init_name: OwnedContractName::new_unchecked("init_registry".to_string()),
-                param: OwnedParameter::from_serial(&parameter).expect("Parameter is valid."),
+                param: OwnedParameter::empty(),
             },
         )
         .expect("Initializing contract");

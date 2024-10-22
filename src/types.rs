@@ -1,6 +1,8 @@
 use crate::errors::Error;
 use concordium_std::SignatureEd25519;
-use concordium_std::{ContractAddress, PublicKeyEd25519, SchemaType, Serialize, Timestamp, Address};
+use concordium_std::{
+    Address, ContractAddress, PublicKeyEd25519, SchemaType, Serialize, Timestamp,
+};
 use core::fmt::Debug;
 
 /// Trait definition of the `IsMessage`. This trait is implemented for the two
@@ -75,6 +77,5 @@ pub struct RegisterEvent {
     pub public_key: PublicKeyEd25519,
     pub contract_address: ContractAddress,
     pub provider: String,
-    pub registrar: Address
+    pub registrar: Address,
 }
-
