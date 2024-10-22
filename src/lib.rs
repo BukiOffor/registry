@@ -23,7 +23,6 @@ pub struct State<S = StateApi> {
     // Add fields to this type to hold state in the smart contract.
     // This field is just an example.
     registry: StateMap<String, Registry, S>,
-    nonces_registry: StateMap<PublicKeyEd25519, u64, S>,
 }
 
 impl State {
@@ -87,7 +86,6 @@ fn validate_signature_and_increase_nonce<T: Serial + IsMessage>(
     message: &T,
     signer: PublicKeyEd25519,
     signature: SignatureEd25519,
-    host: &mut Host<State>,
     crypto_primitives: &impl HasCryptoPrimitives,
     ctx: &ReceiveContext,
 ) -> RegistryResult<()> {
@@ -100,19 +98,6 @@ fn validate_signature_and_increase_nonce<T: Serial + IsMessage>(
     // Calculate the message hash.
     let message_hash: [u8; 32] =
         calculate_message_hash_from_bytes(&to_bytes(&message), crypto_primitives, ctx)?;
-
-    // Get the nonce.
-    let mut entry = host
-        .state_mut()
-        .nonces_registry
-        .entry(signer)
-        .or_insert_with(|| 0);
-
-    // Check the nonce to prevent replay attacks.
-    ensure_eq!(message.nonce(), *entry, Error::NonceMismatch);
-
-    // Bump the nonce.
-    *entry += 1;
 
     // Check the signature.
     let valid_signature =
@@ -129,7 +114,6 @@ fn init(_ctx: &InitContext, state_builder: &mut StateBuilder) -> InitResult<Stat
     // This state can then be used in the other functions.
     Ok(State {
         registry: state_builder.new_map(),
-        nonces_registry: state_builder.new_map(),
     })
 }
 
@@ -171,7 +155,6 @@ fn withdraw_ccd(
     );
     let RegisterParam {
         expiry_time: _,
-        nonce: _,
         mut tag,
         data,
     } = message.clone();
@@ -180,7 +163,6 @@ fn withdraw_ccd(
         &message,
         signer,
         signature,
-        host,
         crypto_primitives,
         ctx,
     )?;

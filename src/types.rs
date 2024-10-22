@@ -11,7 +11,6 @@ use core::fmt::Debug;
 /// function so that the function works with both message types.
 pub trait IsMessage {
     fn expiry_time(&self) -> Timestamp;
-    fn nonce(&self) -> u64;
 }
 
 pub type RegistryResult<T> = Result<T, Error>;
@@ -43,8 +42,6 @@ pub struct RegisterParam {
     pub data: Registry,
     /// A timestamp to make the signatures expire.
     pub expiry_time: Timestamp,
-    /// A nonce to prevent replay attacks.
-    pub nonce: u64,
 }
 
 /// The withdraw message that is signed by the signer.
@@ -62,10 +59,6 @@ pub struct RegisterMessage {
 impl IsMessage for RegisterParam {
     fn expiry_time(&self) -> Timestamp {
         self.expiry_time
-    }
-
-    fn nonce(&self) -> u64 {
-        self.nonce
     }
 }
 
