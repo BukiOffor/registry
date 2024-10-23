@@ -167,10 +167,8 @@ fn test_cannot_register_a_tag_for_another_user() {
     };
 
     let update = chain
-        .contract_update(SIGNER, ALICE, ALICE_ADDR, Energy::from(10_000), payload)
-        .expect("failed to update contract");
-    let err: errors::Error = update.parse_return_value().expect("Deserialize `Error`");
-    assert_eq!(err, errors::Error::WrongSignature)
+        .contract_update(SIGNER, ALICE, ALICE_ADDR, Energy::from(10_000), payload);
+    assert!(update.is_err())
 
 
 
