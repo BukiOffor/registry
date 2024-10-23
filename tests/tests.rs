@@ -175,10 +175,10 @@ fn test_cannot_register_a_tag_for_another_user() {
 
 
 }
-/// Test that invoking the `receive` endpoint with the `true` parameter
-/// results in the `CustomError` being thrown.
+// Test that invoking the `receive` endpoint with the `true` parameter
+// results in the `CustomError` being thrown.
 #[test]
-fn test_throw_error() {
+fn test_cannot_get_key_for_a_tag_that_does_not_exist() {
     let (mut chain, init) = initialize();
 
     // Update the contract via the `receive` entrypoint with the parameter `true`.
@@ -191,15 +191,15 @@ fn test_throw_error() {
             UpdateContractPayload {
                 address: init.contract_address,
                 amount: Amount::zero(),
-                receive_name: OwnedReceiveName::new_unchecked("registry.receive".to_string()),
-                message: OwnedParameter::from_serial(&true).expect("Parameter within size bounds"),
+                receive_name: OwnedReceiveName::new_unchecked("registry.get_key".to_string()),
+                message: OwnedParameter::from_serial(&"alice.ccd").expect("Parameter within size bounds"),
             },
         )
         .expect_err("Update fails with `true` as input.");
 
     // Check that the contract returned `CustomError`.
     let error: errors::Error = update.parse_return_value().expect("Deserialize `Error`");
-    assert_eq!(error, errors::Error::Expired);
+    assert_eq!(error, errors::Error::TagDoesNotExist);
 }
 
 /// Helper method for initializing the contract.
