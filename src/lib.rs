@@ -225,10 +225,9 @@ fn register(
         signature,
         message,
     } = param;
-    ensure!(
-        signer.cmp(&message.data.public_key) == Ordering::Equal,
-        Error::WrongSignature.into()
-    );
+    if signer.cmp(&message.data.public_key) != Ordering::Equal {
+        return Err(Error::WrongSignature.into());
+    };
     let RegisterParam {
         expiry_time: _,
         mut tag,
