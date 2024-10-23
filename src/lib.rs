@@ -24,11 +24,11 @@
 //! - *register*: creates a string tag for a given public key
 //! - *get_key*: gets the account details of a key given a tag.
 //! - *get_tag*: does a reverse lookup and gets the tag when given a key.
-//! 
-//! By design the contract exposes only these 3 entry points. A given public key can 
-//! only have 1 tag for a lifetime. This means that a key cannot be moved 
+//!
+//! By design the contract exposes only these 3 entry points. A given public key can
+//! only have 1 tag for a lifetime. This means that a key cannot be moved
 //! from one smart contract wallet to another once registered.
-//! Note that the cis5 wallet standard does not aim to replace the account system 
+//! Note that the cis5 wallet standard does not aim to replace the account system
 //! on the network but instead a way to quickly onboard users.
 //!
 //! The goal of this standard is to simplify the transfer of assets between accounts and
@@ -66,7 +66,11 @@ pub struct State<S = StateApi> {
 
 impl State {
     fn register(&mut self, tag: String, data: Registry) -> RegistryResult<()> {
-        let Registry { public_key, contract_address: _, provider:_ } = data.clone();    
+        let Registry {
+            public_key,
+            contract_address: _,
+            provider: _,
+        } = data.clone();
         match self.registry.entry(tag.clone()) {
             // check if the tag has been created before.
             Entry::Occupied(_) => Err(Error::TagAlreadyExists),
@@ -132,9 +136,8 @@ fn calculate_message_hash_from_bytes(
 /// It rejects if:
 /// - the message is expired.
 /// - the signature is invalid.
-/// - the nonce is wrong.
 /// - the message hash can not be calculated.
-fn validate_signature_and_increase_nonce<T: Serial + IsMessage>(
+fn validate_signature<T: Serial + IsMessage>(
     message: &T,
     signer: PublicKeyEd25519,
     signature: SignatureEd25519,
@@ -168,6 +171,26 @@ fn init(_ctx: &InitContext, state_builder: &mut StateBuilder) -> InitResult<Stat
         registry: state_builder.new_map(),
         lookup: state_builder.new_map(),
     })
+}
+
+/// Helper function to calculate the `RegisterMessageHash` for a registeration.
+#[receive(
+    contract = "registry",
+    name = "get_param_hash",
+    parameter = "RegisterParam",
+    return_value = "[u8;32]",
+    error = "Error",
+    crypto_primitives,
+    mutable
+)]
+fn contract_get_register_message_hash(
+    ctx: &ReceiveContext,
+    _host: &mut Host<State>,
+    crypto_primitives: &impl HasCryptoPrimitives,
+) -> RegistryResult<[u8; 32]> {
+    // Parse the parameter.
+    let param: RegisterParam = ctx.parameter_cursor().get()?;
+    calculate_message_hash_from_bytes(&to_bytes(&param), crypto_primitives, ctx)
 }
 
 /// The function adds a new tag to the registry.
@@ -211,8 +234,8 @@ fn withdraw_ccd(
         mut tag,
         data,
     } = message.clone();
-    // Validate the signature and increase the nonce.
-    validate_signature_and_increase_nonce(&message, signer, signature, crypto_primitives, ctx)?;
+    // Validate the signature.
+    validate_signature(&message, signer, signature, crypto_primitives, ctx)?;
     if !tag.ends_with(".ccd") {
         tag.push_str(".ccd");
     }
@@ -236,7 +259,7 @@ fn withdraw_ccd(
     contract = "registry",
     name = "get_key",
     parameter = "String",
-    error = "Error",
+    error = "Error"
 )]
 fn get_key(ctx: &ReceiveContext, host: &Host<State>) -> RegistryResult<Registry> {
     let mut tag: String = ctx.parameter_cursor().get()?;
@@ -252,7 +275,7 @@ fn get_key(ctx: &ReceiveContext, host: &Host<State>) -> RegistryResult<Registry>
     contract = "registry",
     name = "get_tag",
     parameter = "PublicKeyEd25519",
-    error = "Error",
+    error = "Error"
 )]
 fn get_tag(ctx: &ReceiveContext, host: &Host<State>) -> RegistryResult<String> {
     let key: PublicKeyEd25519 = ctx.parameter_cursor().get()?;
