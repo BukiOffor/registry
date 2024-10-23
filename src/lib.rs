@@ -225,17 +225,17 @@ fn register(
         signature,
         message,
     } = param;
-    ensure!(
-        signer.cmp(&message.data.public_key) == Ordering::Equal,
-        Error::WrongSignature.into()
-    );
+    // ensure!(
+    //     signer.cmp(&message.data.public_key) == Ordering::Equal,
+    //     Error::WrongSignature.into()
+    // );
     let RegisterParam {
         expiry_time: _,
         mut tag,
         data,
     } = message.clone();
     // Validate the signature.
-    //validate_signature(&message, signer, signature, crypto_primitives, ctx)?;
+    validate_signature(&message, signer, signature, crypto_primitives, ctx)?;
     if !tag.ends_with(".ccd") {
         tag.push_str(".ccd");
     }
