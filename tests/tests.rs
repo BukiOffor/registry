@@ -15,11 +15,20 @@ const SIGNER: Signer = Signer::with_one_key();
 /// Test that invoking the `receive` endpoint with the `false` parameter
 /// succeeds in updating the contract.
 #[test]
-fn test_register_a_tag() {
-    let (mut chain, init) = initialize();
+fn test_get_registry_by_tag() {
+    let tag: String = "alice.ccd".into();
+    let (mut chain, init, alice_public_key) = initialize_chain_and_create_tag(tag.clone());
+    let sim_registry = Registry::new(
+        alice_public_key,
+        ContractAddress {
+            index: 0,
+            subindex: 0,
+        },
+        "AfrixLabs".into(),
+    );
 
     // Update the contract via the `receive` entrypoint with the parameter `false`.
-    chain
+    let update = chain
         .contract_update(
             SIGNER,
             ALICE,
@@ -28,11 +37,15 @@ fn test_register_a_tag() {
             UpdateContractPayload {
                 address: init.contract_address,
                 amount: Amount::zero(),
-                receive_name: OwnedReceiveName::new_unchecked("registry.receive".to_string()),
-                message: OwnedParameter::from_serial(&false).expect("Parameter within size bounds"),
+                receive_name: OwnedReceiveName::new_unchecked("registry.get_key".to_string()),
+                message: OwnedParameter::from_serial(&tag).expect("Parameter within size bounds"),
             },
         )
         .expect("Update succeeds with `false` as input.");
+    let registry: Registry = update.parse_return_value().expect("Deserialize `Error`");
+    assert_eq!(registry.public_key, sim_registry.public_key);
+    assert_eq!(registry.contract_address, sim_registry.contract_address);
+    assert_eq!(registry.provider, sim_registry.provider);
 }
 
 /// Test that invoking the `receive` endpoint with the `true` parameter
@@ -108,7 +121,7 @@ fn initialize() -> (Chain, ContractInitSuccess) {
 ///  - Creates one account, `Alice` with `10_000` CCD as the initial balance.
 ///  - Initializes the contract and create a tag for alice.
 ///  - Returns the [`Chain`] and the [`ContractInitSuccess`]
-fn initialize_chain_and_create_tag(tag: String) -> (Chain, ContractInitSuccess) {
+fn initialize_chain_and_create_tag(tag: String) -> (Chain, ContractInitSuccess, PublicKeyEd25519) {
     use ed25519_dalek::{Signer, SigningKey};
 
     // Initialize the test chain.
@@ -192,5 +205,5 @@ fn initialize_chain_and_create_tag(tag: String) -> (Chain, ContractInitSuccess) 
         .contract_update(SIGNER, ALICE, ALICE_ADDR, Energy::from(10_000), payload)
         .expect("failed to update contract");
 
-    (chain, init)
+    (chain, init, alice_public_key)
 }

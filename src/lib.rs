@@ -71,7 +71,7 @@ impl State {
             contract_address: _,
             provider: _,
         } = data.clone();
-        match self.registry.entry(tag.clone()) {
+        match self.registry.entry(tag.clone().to_lowercase()) {
             // check if the tag has been created before.
             Entry::Occupied(_) => Err(Error::TagAlreadyExists),
             Entry::Vacant(entry) => {
@@ -80,7 +80,7 @@ impl State {
                     return Err(Error::TagAlreadyExists);
                 }
                 entry.insert(data);
-                let _ = self.lookup.insert(public_key, tag);
+                let _ = self.lookup.insert(public_key, tag.to_lowercase());
                 Ok(())
             }
         }
@@ -88,7 +88,7 @@ impl State {
 
     fn get(&self, tag: String) -> RegistryResult<Registry> {
         self.registry
-            .get(&tag)
+            .get(&tag.to_lowercase())
             .map(|r| r.clone())
             .ok_or(Error::TagDoesNotExist)
     }
