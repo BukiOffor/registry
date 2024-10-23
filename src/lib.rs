@@ -229,26 +229,26 @@ fn register(
     //     signer.cmp(&message.data.public_key) == Ordering::Equal,
     //     Error::WrongSignature.into()
     // );
-    let RegisterParam {
-        expiry_time: _,
-        mut tag,
-        data,
-    } = message.clone();
-    // Validate the signature.
-    validate_signature(&message, signer, signature, crypto_primitives, ctx)?;
-    if !tag.ends_with(".ccd") {
-        tag.push_str(".ccd");
-    }
-    // Register tag on chain
-    host.state_mut().register(tag, data)?;
+    // let RegisterParam {
+    //     expiry_time: _,
+    //     mut tag,
+    //     data,
+    // } = message.clone();
+    // // Validate the signature.
+    // validate_signature(&message, signer, signature, crypto_primitives, ctx)?;
+    // if !tag.ends_with(".ccd") {
+    //     tag.push_str(".ccd");
+    // }
+    // // Register tag on chain
+    // host.state_mut().register(tag, data)?;
 
-    logger.log(&Event::Register(RegisterEvent {
-        tag: message.tag,
-        contract_address: message.data.contract_address,
-        public_key: message.data.public_key,
-        provider: message.data.provider,
-        registrar: ctx.sender(),
-    }))?;
+    // logger.log(&Event::Register(RegisterEvent {
+    //     tag: message.tag,
+    //     contract_address: message.data.contract_address,
+    //     public_key: message.data.public_key,
+    //     provider: message.data.provider,
+    //     registrar: ctx.sender(),
+    // }))?;
 
     Ok(())
 }
