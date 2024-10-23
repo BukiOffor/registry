@@ -1,0 +1,6 @@
+[book]
+authors = ["BukiOffor"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Concordium Smart Wallet Registry"

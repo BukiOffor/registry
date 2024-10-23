@@ -20,7 +20,7 @@ pub enum Error {
     Overflow, // -7
     /// Failed because
     TagAlreadyExists, // -8
-    TagDoesNotExist, // -9
-    KeyDoesNotExist, // -10
+    TagDoesNotExist,        // -9
+    KeyDoesNotExist,        // -10
     PublicKeyAlreadyExists, // -11
 }

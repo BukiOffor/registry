@@ -13,3 +13,5 @@ concordium-rust-sdk="4.2"
 tokio = {version = "1.18", features = ["rt", "macros", "rt-multi-thread"] }
 tonic = {version = "0.10", features = ["tls", "tls-roots"]} # Use system trust roots.
 registry = { path = "../" }
+rand = "0.8"
+ed25519-dalek = { version = "2.0", features = ["rand_core"] }
