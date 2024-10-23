@@ -167,10 +167,10 @@ fn test_cannot_register_a_tag_for_another_user() {
     };
 
     let update = chain
-        .contract_update(SIGNER, ALICE, ALICE_ADDR, Energy::from(10_000), payload);
-    assert!(update.is_err())
-
-
+        .contract_update(SIGNER, ALICE, ALICE_ADDR, Energy::from(10_000), payload)
+        .expect_err("failed to update contract");
+    let err: errors::Error = update.parse_return_value().expect("Deserialize `Error`");
+    assert_eq!(err, errors::Error::WrongSignature)
 
 }
 // Test that invoking the `receive` endpoint with the `true` parameter
@@ -198,6 +198,246 @@ fn test_cannot_get_key_for_a_tag_that_does_not_exist() {
     // Check that the contract returned `CustomError`.
     let error: errors::Error = update.parse_return_value().expect("Deserialize `Error`");
     assert_eq!(error, errors::Error::TagDoesNotExist);
+}
+
+
+// Test that invoking the `receive` endpoint with the `true` parameter
+// results in the `CustomError` being thrown.
+#[test]
+fn test_cannot_create_tag_that_exists() {
+    use ed25519_dalek::Signer;
+    let tag:String = "alice.ccd".into();
+    let (mut chain, init, _) = initialize_chain_and_create_tag(tag.clone());
+
+    let rng = &mut rand::thread_rng();
+
+    // Construct signing key.
+    let signing_key = ed25519::SigningKey::generate(rng);
+    let alice_public_key = PublicKeyEd25519(signing_key.verifying_key().to_bytes());
+    let registry = Registry::new(
+        alice_public_key,
+        ContractAddress {
+            index: 0,
+            subindex: 0,
+        },
+        "AfrixLabs".into(),
+    );
+    let param = RegisterParam {
+        tag,
+        data: registry,
+        expiry_time: Timestamp::from_timestamp_millis(5000),
+    };
+    // Get the message hash to be signed.
+    let invoke = chain
+        .contract_invoke(
+            ALICE,
+            ALICE_ADDR,
+            Energy::from(10000),
+            UpdateContractPayload {
+                amount: Amount::zero(),
+                address: init.contract_address,
+                receive_name: OwnedReceiveName::new_unchecked(
+                    "registry.get_param_hash".to_string(),
+                ),
+                message: OwnedParameter::from_serial(&param)
+                    .expect("Should be a valid inut parameter"),
+            },
+        )
+        .expect("Should be able to query getCcdWithdrawMessageHash");
+    let signature = signing_key.sign(&invoke.return_value);
+
+    let message = RegisterMessage {
+        signer: alice_public_key,
+        signature: SignatureEd25519(signature.to_bytes()),
+        message: param,
+    };
+    let payload = UpdateContractPayload {
+        address: init.contract_address,
+        amount: Amount::zero(),
+        receive_name: OwnedReceiveName::new_unchecked("registry.register".to_string()),
+        message: OwnedParameter::from_serial(&message).expect("Parameter within size bounds"),
+    };
+
+    let update = chain
+        .contract_update(SIGNER, ALICE, ALICE_ADDR, Energy::from(10_000), payload)
+        .expect_err("failed to update contract");
+
+    // Check that the contract returned `CustomError`.
+    let error: errors::Error = update.parse_return_value().expect("Deserialize `Error`");
+    assert_eq!(error, errors::Error::TagAlreadyExists);
+}
+
+// Test that invoking the `receive` endpoint with the `true` parameter
+// results in the `CustomError` being thrown.
+#[test]
+fn test_cannot_verify_signature() {
+    use ed25519_dalek::Signer;
+    let tag:String = "bob.ccd".into();
+    let (mut chain, init, alice_public_key) = initialize_chain_and_create_tag(tag.clone());
+
+    let rng = &mut rand::thread_rng();
+
+    // Construct signing key.
+    let signing_key = ed25519::SigningKey::generate(rng);
+    let bob_public_key = PublicKeyEd25519(signing_key.verifying_key().to_bytes());
+    let registry = Registry::new(
+        bob_public_key,
+        ContractAddress {
+            index: 0,
+            subindex: 0,
+        },
+        "AfrixLabs".into(),
+    );
+    let param = RegisterParam {
+        tag: "bob.ccd".into(),
+        data: registry,
+        expiry_time: Timestamp::from_timestamp_millis(5000),
+    };
+    // Get the message hash to be signed.
+    let invoke = chain
+        .contract_invoke(
+            ALICE,
+            ALICE_ADDR,
+            Energy::from(10000),
+            UpdateContractPayload {
+                amount: Amount::zero(),
+                address: init.contract_address,
+                receive_name: OwnedReceiveName::new_unchecked(
+                    "registry.get_param_hash".to_string(),
+                ),
+                message: OwnedParameter::from_serial(&param)
+                    .expect("Should be a valid inut parameter"),
+            },
+        )
+        .expect("Should be able to query getCcdWithdrawMessageHash");
+    let signature = signing_key.sign(&invoke.return_value);
+
+    let message = RegisterMessage {
+        signer: alice_public_key,
+        signature: SignatureEd25519(signature.to_bytes()),
+        message: param,
+    };
+    let payload = UpdateContractPayload {
+        address: init.contract_address,
+        amount: Amount::zero(),
+        receive_name: OwnedReceiveName::new_unchecked("registry.register".to_string()),
+        message: OwnedParameter::from_serial(&message).expect("Parameter within size bounds"),
+    };
+
+    let update = chain
+        .contract_update(SIGNER, ALICE, ALICE_ADDR, Energy::from(10_000), payload)
+        .expect_err("failed to update contract");
+
+    // Check that the contract returned `CustomError`.
+    let error: errors::Error = update.parse_return_value().expect("Deserialize `Error`");
+    assert_eq!(error, errors::Error::WrongSignature);
+}
+
+#[test]
+fn test_cannot_register_a_key_twice() {
+    use ed25519_dalek::{Signer, SigningKey};
+
+    // Initialize the test chain.
+    let (mut chain, init) = initialize();
+    let tag: String = "alice.ccd".into();
+
+    let rng = &mut rand::thread_rng();
+
+    // Construct signing key.
+    let signing_key = SigningKey::generate(rng);
+    let alice_public_key = PublicKeyEd25519(signing_key.verifying_key().to_bytes());
+    let registry = Registry::new(
+        alice_public_key,
+        ContractAddress {
+            index: 0,
+            subindex: 0,
+        },
+        "AfrixLabs".into(),
+    );
+    let param = RegisterParam {
+        tag,
+        data: registry.clone(),
+        expiry_time: Timestamp::from_timestamp_millis(5000),
+    };
+    // Get the message hash to be signed.
+    let invoke = chain
+        .contract_invoke(
+            ALICE,
+            ALICE_ADDR,
+            Energy::from(10000),
+            UpdateContractPayload {
+                amount: Amount::zero(),
+                address: init.contract_address,
+                receive_name: OwnedReceiveName::new_unchecked(
+                    "registry.get_param_hash".to_string(),
+                ),
+                message: OwnedParameter::from_serial(&param)
+                    .expect("Should be a valid inut parameter"),
+            },
+        )
+        .expect("Should be able to query getCcdWithdrawMessageHash");
+    let signature = signing_key.sign(&invoke.return_value);
+
+
+    let message = RegisterMessage {
+        signer: alice_public_key,
+        signature: SignatureEd25519(signature.to_bytes()),
+        message: param,
+    };
+    let payload = UpdateContractPayload {
+        address: init.contract_address,
+        amount: Amount::zero(),
+        receive_name: OwnedReceiveName::new_unchecked("registry.register".to_string()),
+        message: OwnedParameter::from_serial(&message).expect("Parameter within size bounds"),
+    };
+
+    chain
+        .contract_update(SIGNER, ALICE, ALICE_ADDR, Energy::from(10_000), payload)
+        .expect("failed to update contract");
+
+        let param = RegisterParam {
+            tag: "alice_new_key.ccd".into(),
+            data: registry,
+            expiry_time: Timestamp::from_timestamp_millis(5000),
+        };
+        // Get the message hash to be signed.
+        let invoke = chain
+            .contract_invoke(
+                ALICE,
+                ALICE_ADDR,
+                Energy::from(10000),
+                UpdateContractPayload {
+                    amount: Amount::zero(),
+                    address: init.contract_address,
+                    receive_name: OwnedReceiveName::new_unchecked(
+                        "registry.get_param_hash".to_string(),
+                    ),
+                    message: OwnedParameter::from_serial(&param)
+                        .expect("Should be a valid inut parameter"),
+                },
+            )
+            .expect("Should be able to query getCcdWithdrawMessageHash");
+        let signature = signing_key.sign(&invoke.return_value);
+    
+    
+        let message = RegisterMessage {
+            signer: alice_public_key,
+            signature: SignatureEd25519(signature.to_bytes()),
+            message: param,
+        };
+        let payload = UpdateContractPayload {
+            address: init.contract_address,
+            amount: Amount::zero(),
+            receive_name: OwnedReceiveName::new_unchecked("registry.register".to_string()),
+            message: OwnedParameter::from_serial(&message).expect("Parameter within size bounds"),
+        };
+    let update =  chain
+        .contract_update(SIGNER, ALICE, ALICE_ADDR, Energy::from(10_000), payload)
+        .expect_err("failed to update contract");
+
+    let err: errors::Error = update.parse_return_value().expect("Deserialize `Error`");
+    assert_eq!(err, errors::Error::PublicKeyAlreadyExists)
+
 }
 
 /// Helper method for initializing the contract.

@@ -77,7 +77,7 @@ impl State {
             Entry::Vacant(entry) => {
                 // check if the public key has created a tag for this key before.
                 if self.lookup.get(&public_key).is_some() {
-                    return Err(Error::TagAlreadyExists);
+                    return Err(Error::PublicKeyAlreadyExists);
                 }
                 entry.insert(data);
                 let _ = self.lookup.insert(public_key, tag.to_lowercase());
