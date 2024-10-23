@@ -1,0 +1,350 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Security Considerations (Revised) - Concordium Smart Wallet Registry</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="overview.html">Overview</a></li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">2.</strong> Understanding the CIS5 Wallet Registry</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">3.</strong> Deploying and Initializing a Smart Contract</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">4.</strong> Registering Wallet Tags</a></li><li class="chapter-item expanded "><a href="chapter_5.html"><strong aria-hidden="true">5.</strong> Retrieving Tags and Public Keys</a></li><li class="chapter-item expanded "><a href="chapter_6.html" class="active"><strong aria-hidden="true">6.</strong> Security Considerations (Revised)</a></li><li class="chapter-item expanded "><a href="chapter_7.html"><strong aria-hidden="true">7.</strong> Interacting with the Registry</a></li><li class="chapter-item expanded "><a href="chapter_8.html"><strong aria-hidden="true">8.</strong> Real-World Applications</a></li><li class="chapter-item expanded "><a href="chapter_9.html"><strong aria-hidden="true">9.</strong> Conclusion</a></li><li class="chapter-item expanded affix "><a href="Contributors.html">Contributors</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Concordium Smart Wallet Registry</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h3 id="chapter-6-security-considerations-revised"><a class="header" href="#chapter-6-security-considerations-revised">Chapter 6: <strong>Security Considerations (Revised)</strong></a></h3>
+<p>When dealing with a smart contract registry that stores sensitive information like public keys and wallet addresses, security is paramount. In this chapter, we will discuss the built-in security mechanisms of the CIS5 wallet registry, including signature verification and error handling. These features ensure that only authorized parties can interact with the registry, and that the data integrity is maintained throughout the lifecycle of the contract.</p>
+<hr />
+<h4 id="61-signature-verification"><a class="header" href="#61-signature-verification">6.1 Signature Verification</a></h4>
+<p>The contract relies heavily on <strong>signature verification</strong> to ensure that actions like registering a wallet tag or retrieving sensitive information can only be performed by authorized entities. In the registry, <strong>Ed25519 signatures</strong> are used to secure messages and prove ownership of the corresponding public keys.</p>
+<h5 id="611-validating-signatures"><a class="header" href="#611-validating-signatures">6.1.1 Validating Signatures</a></h5>
+<p>The key function responsible for validating signatures in this contract is <code>validate_signature</code>. This function checks that the message was indeed signed by the owner of the provided public key and that the signature has not expired.</p>
+<p>Here’s the relevant code:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn validate_signature&lt;T: Serial + IsMessage&gt;(
+    message: &amp;T,
+    signer: PublicKeyEd25519,
+    signature: SignatureEd25519,
+    crypto_primitives: &amp;impl HasCryptoPrimitives,
+    ctx: &amp;ReceiveContext,
+) -&gt; RegistryResult&lt;()&gt; {
+    // Check that the signature is not expired.
+    ensure!(
+        message.expiry_time() &gt; ctx.metadata().slot_time(),
+        Error::Expired
+    );
+
+    // Calculate the message hash.
+    let message_hash: [u8; 32] =
+        calculate_message_hash_from_bytes(&amp;to_bytes(&amp;message), crypto_primitives, ctx)?;
+
+    // Check the signature.
+    let valid_signature =
+        crypto_primitives.verify_ed25519_signature(signer, signature, &amp;message_hash);
+    ensure!(valid_signature, Error::WrongSignature);
+
+    Ok(())
+}
+<span class="boring">}</span></code></pre></pre>
+<h5 id="612-steps-in-signature-verification"><a class="header" href="#612-steps-in-signature-verification">6.1.2 Steps in Signature Verification</a></h5>
+<ol>
+<li>
+<p><strong>Message Expiry</strong>:</p>
+<ul>
+<li>First, the function checks whether the message has expired. This is critical to prevent replay attacks, where an old message is resent to the contract in an attempt to manipulate the state. If the message’s expiry time has passed, the contract returns the <code>Error::Expired</code> error.</li>
+</ul>
+</li>
+<li>
+<p><strong>Message Hash Calculation</strong>:</p>
+<ul>
+<li>The contract then calculates the hash of the message. This hash is used to verify the signature and ensure that the message has not been tampered with.</li>
+</ul>
+</li>
+<li>
+<p><strong>Signature Validation</strong>:</p>
+<ul>
+<li>Finally, the contract checks the validity of the signature using the <code>verify_ed25519_signature</code> function. If the signature does not match the signer’s public key, the contract returns the <code>Error::WrongSignature</code> error.</li>
+</ul>
+</li>
+</ol>
+<p>By following this process, the contract ensures that only authorized users (i.e., those with valid signatures) can interact with it.</p>
+<h5 id="613-why-ed25519"><a class="header" href="#613-why-ed25519">6.1.3 Why Ed25519?</a></h5>
+<p>The <strong>Ed25519</strong> signature scheme is chosen for its strong security properties, including resistance to attacks on elliptic curve cryptography and speed in verifying signatures. It is widely used in blockchain applications due to these strengths and its compact key sizes.</p>
+<hr />
+<h4 id="62-error-handling-for-security"><a class="header" href="#62-error-handling-for-security">6.2 Error Handling for Security</a></h4>
+<p>The contract includes several error handling mechanisms that ensure it operates securely and reliably. These error messages are returned when certain security checks fail, allowing users and wallet providers to understand what went wrong and take corrective action.</p>
+<h5 id="621-key-errors-and-their-purpose"><a class="header" href="#621-key-errors-and-their-purpose">6.2.1 Key Errors and Their Purpose</a></h5>
+<ol>
+<li>
+<p><strong><code>Error::Expired</code></strong>:</p>
+<ul>
+<li>This error is triggered when a message is submitted after its expiry time. It prevents old messages from being replayed and ensures that only recent, valid transactions are processed.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>Error::WrongSignature</code></strong>:</p>
+<ul>
+<li>If the signature verification fails (i.e., the signature does not match the public key), the contract returns this error. This prevents unauthorized users from submitting messages on behalf of others.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>Error::TagAlreadyExists</code></strong>:</p>
+<ul>
+<li>This error occurs when a user tries to register a tag that already exists in the contract. It ensures the uniqueness of tags and prevents key duplication.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>Error::KeyDoesNotExist</code></strong> and <strong><code>Error::TagDoesNotExist</code></strong>:</p>
+<ul>
+<li>These errors are returned when a user tries to look up a key or tag that is not registered in the contract. This prevents unauthorized or erroneous access to the contract’s state.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h4 id="63-additional-security-considerations"><a class="header" href="#63-additional-security-considerations">6.3 Additional Security Considerations</a></h4>
+<p>While signature verification is one of the most critical aspects of security in this contract, other practices help ensure the contract’s overall security and integrity:</p>
+<ol>
+<li>
+<p><strong>No Mutable External Calls</strong>:</p>
+<ul>
+<li>The contract does not make any external calls during state changes that could modify the state of other contracts. This limits its attack surface and reduces the risk of reentrancy attacks.</li>
+</ul>
+</li>
+<li>
+<p><strong>Limited Entry Points</strong>:</p>
+<ul>
+<li>The contract exposes only three core entry points (<code>register</code>, <code>get_key</code>, and <code>get_tag</code>). By keeping the interface minimal, the contract limits the potential for security vulnerabilities and reduces the complexity of interactions.</li>
+</ul>
+</li>
+<li>
+<p><strong>Testing and Auditing</strong>:</p>
+<ul>
+<li>Rigorous testing of the contract’s functionality and security features is essential before deployment. Audits by independent security experts can help identify any potential vulnerabilities or weaknesses in the contract’s design.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="chapter-summary"><a class="header" href="#chapter-summary">Chapter Summary</a></h3>
+<p>In this chapter, we explored the key security features of the CIS5 wallet registry contract:</p>
+<ul>
+<li><strong>Signature Verification</strong> ensures that only authorized users can interact with the contract.</li>
+<li><strong>Error Handling</strong> provides clear feedback when security checks fail, allowing users to understand and resolve issues.</li>
+<li><strong>Additional Security Practices</strong> like limiting entry points and avoiding mutable external calls further enhance the contract’s robustness.</li>
+</ul>
+<p>Together, these mechanisms provide a secure and reliable foundation for the CIS5 wallet registry, protecting users and their assets from unauthorized access and manipulation.</p>
+<p>In the next chapter, <strong>Chapter 7: Deployment and Usage</strong>, we’ll guide you through deploying the contract on the Concordium network and demonstrate how to interact with it in a live environment.</p>
+<hr />
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="chapter_5.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="chapter_7.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="chapter_5.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="chapter_7.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

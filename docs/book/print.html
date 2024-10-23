@@ -1,0 +1,1112 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Concordium Smart Wallet Registry</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="overview.html">Overview</a></li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">2.</strong> Understanding the CIS5 Wallet Registry</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">3.</strong> Deploying and Initializing a Smart Contract</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">4.</strong> Registering Wallet Tags</a></li><li class="chapter-item expanded "><a href="chapter_5.html"><strong aria-hidden="true">5.</strong> Retrieving Tags and Public Keys</a></li><li class="chapter-item expanded "><a href="chapter_6.html"><strong aria-hidden="true">6.</strong> Security Considerations (Revised)</a></li><li class="chapter-item expanded "><a href="chapter_7.html"><strong aria-hidden="true">7.</strong> Interacting with the Registry</a></li><li class="chapter-item expanded "><a href="chapter_8.html"><strong aria-hidden="true">8.</strong> Real-World Applications</a></li><li class="chapter-item expanded "><a href="chapter_9.html"><strong aria-hidden="true">9.</strong> Conclusion</a></li><li class="chapter-item expanded affix "><a href="Contributors.html">Contributors</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Concordium Smart Wallet Registry</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h3 id="overview"><a class="header" href="#overview">Overview</a></h3>
+<p>The CIS5-Wallet Standard is growing at an incredible pace, bringing new technologies and standards that promise to make decentralized applications more efficient, secure, and user-friendly. One of the biggest challenges in this space is simplifying the management of cryptographic keys, which are often long and a bit difficult to work with.</p>
+<p>This book introduces the <strong>CIS5 Wallet Registry</strong>, a smart contract-based solution designed to address this challenge. By allowing users to create human-readable tags for their public keys, the CIS5 wallet registry simplifies interactions between users and blockchain wallets. The registry also enhances interoperability across wallet providers, making it easier to manage digital assets securely and efficiently.</p>
+<p>Through this book, you will explore the design, functionality, and potential applications of the CIS5 wallet registry, understanding how it aims to make blockchain technology more accessible and practical for both developers and everyday users.</p>
+<p>Whether you're a developer looking to integrate the CIS5 standard into your projects, or a user curious about simplifying your blockchain experience, this book provides the foundation you need to engage with this innovative protocol.</p>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="chapter-1-introduction"><a class="header" href="#chapter-1-introduction">Chapter 1: <strong>Introduction</strong></a></h3>
+<p><strong>Building a CIS5 Wallet Registry Smart Contract on Concordium</strong></p>
+<p>In the fast-paced world of blockchain, smart contracts are becoming the cornerstone of decentralized systems, enabling secure, automated transactions without intermediaries. However, as decentralized applications (dApps) proliferate, there arises a critical need for standards that simplify user interactions, especially in wallet management.</p>
+<p>In this book, we will explore a practical solution to a common problem: the unreadability and inflexibility of ed25519 public keys on chaperone accounts. We’ll achieve this by building a smart contract that registers user-friendly tags for wallets, making it easier to interact with blockchain-based wallets while maintaining security. This smart contract mimics the CIS5 wallet standard and is deployed on Concordium, a blockchain platform known for its strong focus on privacy and regulatory compliance.</p>
+<p><strong>The Problem: Public Key Readability and Usability</strong></p>
+<p>Public keys, such as those used in blockchain wallets, are long, complex strings of characters. While they are crucial for ensuring secure asset management, they are far from user-friendly. Typing or sharing these keys introduces the risk of human error, which can lead to lost assets or failed transactions.</p>
+<p>Consider the <code>PublicKeyEd25519</code> used in Concordium's smart contracts wallet. This key, while highly secure, is not meant for human interaction. Users are required to copy and paste these keys or store them securely, and any mistake in this process can lead to catastrophic results. Furthermore, if users want to interact with different smart contracts, they have no easy way of associating their public key with a specific wallet or application.</p>
+<p><strong>The CIS5 Wallet Registry</strong></p>
+<p>The CIS5 wallet registry addresses some of these concerns by defining a more user-friendly way to manage wallets. The standard is designed to facilitate the use of blockchain wallets for managing both native and token assets on Concordium.</p>
+<p>In this book, we will extend the utility of CIS5 wallets by creating a registry that maps these cryptographic keys to human-readable tags. Users will be able to register a tag, such as <code>alice.ccd</code>, which can then be used for subsequent interactions on the blockchain. This allows for simpler, more intuitive wallet management.</p>
+<p><strong>The Goal of This Book</strong></p>
+<p>By the end of this book, you will understand how to build and deploy a smart contract on Concordium that:</p>
+<ul>
+<li>Maps human-readable tags to cryptographic public keys.</li>
+<li>Allows for reverse lookups, where a public key can return its associated tag.</li>
+<li>Ensures that each key can only have one tag for its lifetime.</li>
+<li>Exposes simple and secure interfaces for registering, retrieving, and managing these wallet tags.</li>
+</ul>
+<p>Whether you are a seasoned blockchain developer or just starting out, this book will provide you with the knowledge and tools needed to create your own smart contract solutions, while offering insights into the practical use cases of the CIS5 wallet standard.</p>
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><h3 id="chapter-2-understanding-the-cis5-wallet-registry"><a class="header" href="#chapter-2-understanding-the-cis5-wallet-registry">Chapter 2: <strong>Understanding the CIS5 Wallet Registry</strong></a></h3>
+<p>The CIS5 wallet standard is designed to streamline blockchain transactions by providing a standardized way of handling public keys and smart contracts. However, its use becomes much more practical when combined with a system that allows these cryptographic public keys to be associated with human-readable tags. This is where the wallet registry comes in.</p>
+<p>In this chapter, we will break down the CIS5 wallet registry smart contract step by step, explaining its functionality and importance within the broader context of blockchain technology. We’ll also dive into the core features of the contract, its structure, and its interactions on the Concordium blockchain.</p>
+<h4 id="21-what-is-the-cis5-wallet-standard"><a class="header" href="#21-what-is-the-cis5-wallet-standard">2.1 What is the CIS5 Wallet Standard?</a></h4>
+<p>The CIS5 wallet standard defines a structure for managing blockchain wallets on Concordium. At its core, it allows users to control a wallet through a specific type of cryptographic key, <code>PublicKeyEd25519</code>, which is known for its security and efficiency in signing digital signatures.</p>
+<p>However, as secure as this key may be, it remains unreadable to humans. The CIS5 standard enables decentralized wallets but does not offer a way to make these keys more user-friendly. This limitation makes it difficult for users to interact with the blockchain without directly managing these complex keys and there coresponding smart contract wallets.</p>
+<p>The CIS5 wallet registry is built to overcome this limitation by allowing users to create a unique tag associated with their public key. This tag, such as <code>user123.ccd</code>, becomes a recognizable identifier that users can easily share, reducing the risk of human error when transferring assets or interacting with smart contracts.</p>
+<h4 id="22-purpose-of-the-wallet-registry"><a class="header" href="#22-purpose-of-the-wallet-registry">2.2 Purpose of the Wallet Registry</a></h4>
+<p>The wallet registry serves several purposes within a blockchain environment:</p>
+<ol>
+<li>
+<p><strong>Human Readability:</strong> Instead of dealing with long, cryptographic strings, users can register a simple, memorable tag, which is appended with <code>.ccd</code> to signify that it is a registered CIS5 wallet address. For example, a user could register <code>alice.ccd</code> instead of having to use their public key.</p>
+</li>
+<li>
+<p><strong>Standardized Lookup System:</strong> Once registered, these tags can be queried by other smart contracts or wallets to retrieve the associated public key and wallet information. This creates a standard system where any wallet provider that supports the CIS5 standard can interact with the registry seamlessly.</p>
+</li>
+<li>
+<p><strong>Error Reduction:</strong> By using a human-readable tag instead of a complex cryptographic key, the registry reduces the likelihood of errors during transactions. Users no longer need to worry about copying and pasting their public keys, which can lead to costly mistakes if done incorrectly.</p>
+</li>
+<li>
+<p><strong>Interoperability:</strong> While various wallets and smart contracts can operate independently on the blockchain, the wallet registry provides a unified system for managing wallet information across different platforms and providers. Any wallet or app that supports the CIS5 standard can easily query the registry for details about a specific tag.</p>
+</li>
+</ol>
+<h4 id="23-the-core-features-of-the-smart-contract"><a class="header" href="#23-the-core-features-of-the-smart-contract">2.3 The Core Features of the Smart Contract</a></h4>
+<p>The CIS5 wallet registry smart contract is designed with three key operations:</p>
+<ol>
+<li>
+<p><strong>Registering a Tag:</strong>
+The <code>register</code> function allows a user to associate a human-readable tag with their public key. This tag is unique and cannot be changed once registered. The function ensures that each public key can only be associated with one tag, preventing duplicate entries or accidental overwrites. This function is trustless because each wallet data is pre-signed by the corresponding private key that claims to hold this public key. This signature is verified on chain before the registeration occurs.</p>
+</li>
+<li>
+<p><strong>Retrieving a Key by Tag:</strong>
+The <code>get_key</code> function allows other smart contracts, applications, or users to query the registry by providing a tag (e.g., <code>alice.ccd</code>). The registry returns the associated public key and other relevant wallet information, such as the wallet provider and contract address.</p>
+</li>
+<li>
+<p><strong>Reverse Lookup (Getting a Tag by Key):</strong>
+The <code>get_tag</code> function performs a reverse lookup, where a public key is provided, and the associated tag is returned. This is useful in cases where a user or service only knows the public key but needs to find the human-readable tag.</p>
+</li>
+</ol>
+<h4 id="24-contract-structure-overview"><a class="header" href="#24-contract-structure-overview">2.4 Contract Structure Overview</a></h4>
+<p>The CIS5 wallet registry smart contract is divided into several components, each of which handles a specific part of the contract’s functionality. Here’s a high-level breakdown of the structure:</p>
+<ul>
+<li>
+<p><strong>State Definition:</strong>
+The contract maintains a <code>registry</code>, which is a mapping between tags and the associated wallet details. It also maintains a <code>lookup</code>, which is a reverse mapping that associates public keys with their registered tags. This ensures that both forward and reverse lookups are efficient.</p>
+</li>
+<li>
+<p><strong>Error Handling:</strong>
+The contract defines several custom error types, such as <code>TagAlreadyExists</code> and <code>TagDoesNotExist</code>, which handle invalid operations gracefully. For example, if a user tries to register a tag that has already been claimed, the contract returns the <code>TagAlreadyExists</code> error.</p>
+</li>
+<li>
+<p><strong>Signature Validation:</strong>
+Each operation is cryptographically secure, and the contract validates signatures to ensure that only the owner of a public key can register a tag or manage the associated wallet information. This prevents unauthorized users from tampering with the registry.</p>
+</li>
+<li>
+<p><strong>Event Logging:</strong>
+Events are logged for each action performed within the smart contract. For example, when a new tag is registered, an event is emitted with details about the tag and the associated public key. This allows external applications to track updates to the registry.</p>
+</li>
+</ul>
+<p>The following chapters will delve into each of these functions in greater detail, walking through the code and its logic. But before we move forward, let's discuss the technical environment where the contract operates: the Concordium blockchain.</p>
+<h4 id="25-why-concordium"><a class="header" href="#25-why-concordium">2.5 Why Concordium?</a></h4>
+<p>Concordium is a public, proof-of-stake blockchain with a strong focus on privacy and regulatory compliance. It offers several features that make it an ideal platform for deploying smart contracts, especially those related to wallet management.</p>
+<ul>
+<li>
+<p><strong>Privacy and Compliance:</strong> Concordium's built-in identity layer ensures that users maintain their privacy while complying with regulations. This is especially important for applications like wallet registries, where user data must be handled carefully.</p>
+</li>
+<li>
+<p><strong>Security:</strong> The blockchain uses highly secure cryptographic algorithms which forms the backbone of the CIS5 wallet standard. The smart contract relies on these cryptographic primitives to ensure that public keys and signatures are handled securely.</p>
+</li>
+<li>
+<p><strong>Efficiency:</strong> Concordium is designed to handle a high volume of transactions without sacrificing security or speed. This is crucial for scalability, where users will regularly query the network for information.</p>
+</li>
+</ul>
+<p>In the next chapter, we will explore the initialization process of the CIS5 wallet registry, walking through the contract’s deployment and initial setup.</p>
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><h3 id="chapter-3-deploying-and-initializing-a-smart-contract"><a class="header" href="#chapter-3-deploying-and-initializing-a-smart-contract">Chapter 3: <strong>Deploying and Initializing a Smart Contract</strong></a></h3>
+<p>In this chapter, we will walk through the deployment and initialization process of the CIS5 wallet registry smart contract on Concordium. Deploying a smart contract is the first crucial step in getting your registry up and running. We'll cover how to set up the contract state, register initial values, and ensure that the contract is prepared for interaction with external users and applications.</p>
+<p>By the end of this chapter, you’ll understand how to deploy the wallet registry on Concordium and how to initialize the contract with the necessary data structures.</p>
+<hr />
+<h4 id="31-understanding-the-smart-contract-lifecycle"><a class="header" href="#31-understanding-the-smart-contract-lifecycle">3.1 Understanding the Smart Contract Lifecycle</a></h4>
+<p>Smart contracts on Concordium follow a lifecycle that begins with deployment and ends when the contract is no longer in use. This lifecycle includes several key stages:</p>
+<ul>
+<li><strong>Initialization</strong>: This is where the contract’s state is created and any necessary parameters are set.</li>
+<li><strong>Interaction</strong>: Once deployed, the contract can be interacted with by users or other contracts, triggering specific functions.</li>
+<li><strong>State Management</strong>: As users interact with the contract, its state evolves, storing new information or updating existing entries.</li>
+</ul>
+<p>Before users can register their wallet tags, we need to deploy and initialize the contract, setting up the necessary structures for future interaction.</p>
+<h4 id="32-preparing-for-deployment"><a class="header" href="#32-preparing-for-deployment">3.2 Preparing for Deployment</a></h4>
+<p>Before deploying the contract, you need to have a working Concordium node or access to Concordium's smart contract development tools, such as:</p>
+<ul>
+<li><strong>Concordium Node</strong>: You can either run your own Concordium node or use a testnet node provided by the platform.</li>
+<li><strong>Concordium Client</strong>: The client is used to interact with the blockchain, deploy contracts, and manage transactions.</li>
+<li><strong>Development Environment</strong>: Make sure you have Rust and Concordium's smart contract SDK set up to compile and deploy the contract.</li>
+</ul>
+<p>The contract must be compiled to WebAssembly (Wasm) format before it can be deployed. The Wasm file will then be uploaded to the blockchain via the Concordium client.</p>
+<h4 id="33-compiling-the-smart-contract"><a class="header" href="#33-compiling-the-smart-contract">3.3 Compiling the Smart Contract</a></h4>
+<p>Once the contract is written, you need to compile it into a Wasm binary that can be deployed to Concordium. Here’s how you can do it:</p>
+<ol>
+<li>
+<p><strong>Navigate to the Contract Directory</strong>: Ensure that your contract code is in a directory with the necessary dependencies, such as <code>Cargo.toml</code> configured for smart contract development.</p>
+</li>
+<li>
+<p><strong>Compile the Contract</strong>: Use the following command to compile your contract to Wasm:</p>
+<pre><code class="language-bash">cargo concordium build
+</code></pre>
+<p>This command generates a <code>.wasm</code> file in the <code>target/wasm32-unknown-unknown/release</code> directory, which can then be deployed to Concordium.</p>
+</li>
+</ol>
+<h4 id="34-deploying-the-smart-contract"><a class="header" href="#34-deploying-the-smart-contract">3.4 Deploying the Smart Contract</a></h4>
+<p>Once the contract is compiled, it’s ready to be deployed to the blockchain. The Concordium client will handle the process of uploading the contract and executing the necessary transactions to make it available on-chain.</p>
+<p>Here’s the basic process:</p>
+<ol>
+<li>
+<p><strong>Upload the Wasm File</strong>: Use the following command to deploy the contract:</p>
+<pre><code class="language-bash">concordium-client module deploy &lt;path-to-wasm-file&gt; --sender &lt;sender-account&gt; --energy &lt;energy-limit&gt;
+</code></pre>
+<p>This command uploads the Wasm file and initializes the contract with the sender account.</p>
+</li>
+<li>
+<p><strong>Initialize the Contract</strong>: After the Wasm file is deployed, the contract needs to be initialized. In the case of the CIS5 wallet registry, we need to set up the <code>registry</code> and <code>lookup</code> mappings that store tags and public keys.</p>
+<p>The initialization function is defined as:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[init(contract = "registry")]
+fn init(_ctx: &amp;InitContext, state_builder: &amp;mut StateBuilder) -&gt; InitResult&lt;State&gt; {
+    Ok(State {
+        registry: state_builder.new_map(),
+        lookup: state_builder.new_map(),
+    })
+}
+<span class="boring">}</span></code></pre></pre>
+<p>When the <code>init</code> function is called, it sets up an empty <code>registry</code> (for tag-to-public-key mappings) and <code>lookup</code> (for public-key-to-tag reverse lookups). These data structures are necessary for the registry to function.</p>
+</li>
+<li>
+<p><strong>Command to Initialize</strong>:
+Use the following command to initialize the contract after deployment:</p>
+<pre><code class="language-bash">concordium-client contract init &lt;module-ref&gt; --init-function init --sender &lt;sender-account&gt; --energy &lt;energy-limit&gt;
+</code></pre>
+<p>This command initializes the contract, setting up its initial state.</p>
+</li>
+</ol>
+<p>Once initialized, the contract is ready to handle registrations, lookups, and interactions from users.</p>
+<h4 id="35-contract-state-setup"><a class="header" href="#35-contract-state-setup">3.5 Contract State Setup</a></h4>
+<p>At initialization, the contract’s state is defined by the <code>State</code> struct:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Serial, DeserialWithState)]
+#[concordium(state_parameter = "S")]
+pub struct State&lt;S = StateApi&gt; {
+    registry: StateMap&lt;String, Registry, S&gt;,
+    lookup: StateMap&lt;PublicKeyEd25519, String, S&gt;,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The <code>registry</code> and <code>lookup</code> are maps that store:</p>
+<ul>
+<li>
+<p><strong>Registry</strong>: A mapping from a string (the tag) to a <code>Registry</code> object. The <code>Registry</code> object includes details like the public key, contract address, and provider.</p>
+</li>
+<li>
+<p><strong>Lookup</strong>: A reverse lookup that maps a <code>PublicKeyEd25519</code> to the associated tag string.</p>
+</li>
+</ul>
+<p>The state is created during initialization by calling <code>state_builder.new_map()</code>, which sets up empty mappings for both <code>registry</code> and <code>lookup</code>. These mappings will be populated as users register their wallet tags through interactions with the contract.</p>
+<h4 id="36-initializing-with-test-data"><a class="header" href="#36-initializing-with-test-data">3.6 Initializing with Test Data</a></h4>
+<p>During the testing phase or deployment to a development environment, you may want to initialize the contract with some test data to verify its functionality. You can modify the initialization function to include a few example entries, like so:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[init(contract = "registry")]
+fn init(_ctx: &amp;InitContext, state_builder: &amp;mut StateBuilder) -&gt; InitResult&lt;State&gt; {
+    let mut registry = state_builder.new_map();
+    let mut lookup = state_builder.new_map();
+
+    // Example entry
+    let test_key = PublicKeyEd25519([1; 32]); // Example public key
+    let test_registry = Registry {
+        public_key: test_key,
+        contract_address: AccountAddress([2; 32]),
+        provider: "TestProvider".to_string(),
+    };
+
+    registry.insert("example.ccd".to_string(), test_registry.clone());
+    lookup.insert(test_key, "example.ccd".to_string());
+
+    Ok(State {
+        registry,
+        lookup,
+    })
+}
+<span class="boring">}</span></code></pre></pre>
+<p>In this example, we pre-register a tag (<code>example.ccd</code>) and its associated public key, contract address, and provider. This allows for easier testing and validation of the contract’s functionality.</p>
+<h4 id="37-finalizing-deployment"><a class="header" href="#37-finalizing-deployment">3.7 Finalizing Deployment</a></h4>
+<p>After initialization, the contract is live on the Concordium blockchain and ready for interaction. Users and other contracts can now register tags, retrieve public keys, and perform reverse lookups. Each transaction will update the contract’s state and emit events, which can be tracked for auditing purposes.</p>
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><h3 id="chapter-4-registering-wallet-tags"><a class="header" href="#chapter-4-registering-wallet-tags">Chapter 4: <strong>Registering Wallet Tags</strong></a></h3>
+<p>It’s time to explore how users can interact with the contract to register their wallet tags. The process of registration is crucial because it maps a human-readable tag to a user's public key and smart contract wallet. This enables smooth and error-free transactions on the Concordium network.</p>
+<p>In this chapter, we’ll cover how the <code>register</code> function works, its parameters, and how to validate and execute a successful registration.</p>
+<hr />
+<h4 id="41-overview-of-the-registration-process"><a class="header" href="#41-overview-of-the-registration-process">4.1 Overview of the Registration Process</a></h4>
+<p>The core function for registering wallet tags in this contract is called <code>register</code>. This function performs several critical tasks:</p>
+<ul>
+<li><strong>Validates</strong> the user's signature to ensure that the request is authentic.</li>
+<li><strong>Ensures uniqueness</strong> by checking if the tag or public key has already been registered.</li>
+<li><strong>Registers the tag</strong> by mapping it to the public key and wallet contract details.</li>
+</ul>
+<p>The registration process takes in a user-generated tag and appends the <code>.ccd</code> suffix to it, creating a standardized and unique identifier across the Concordium network.</p>
+<h4 id="42-the-register-function"><a class="header" href="#42-the-register-function">4.2 The <code>register</code> Function</a></h4>
+<p>The contract function responsible for this action is as follows:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn register(&amp;mut self, tag: String, data: Registry) -&gt; RegistryResult&lt;()&gt; {
+    let Registry { public_key, contract_address: _, provider:_ } = data.clone();    
+    match self.registry.entry(tag.clone()) {
+        // check if the tag has been created before.
+        Entry::Occupied(_) =&gt; Err(Error::TagAlreadyExists),
+        Entry::Vacant(entry) =&gt; {
+            // check if the public key has created a tag for this key before.
+            if self.lookup.get(&amp;public_key).is_some() {
+                return Err(Error::TagAlreadyExists);
+            }
+            entry.insert(data);
+            let _ = self.lookup.insert(public_key, tag);
+            Ok(())
+        }
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Let’s break this down step by step:</p>
+<ol>
+<li>
+<p><strong>Inputs</strong>:</p>
+<ul>
+<li><code>tag</code>: A string representing the tag the user wants to register (e.g., <code>"alice"</code>).</li>
+<li><code>data</code>: A <code>Registry</code> object containing the user's <code>public_key</code>, <code>contract_address</code>, and <code>provider</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Tag Existence Check</strong>:</p>
+<ul>
+<li>First, the contract checks if the tag already exists by attempting to look it up in the <code>registry</code> map. If the tag is already registered, the contract returns an error (<code>Error::TagAlreadyExists</code>).</li>
+</ul>
+</li>
+<li>
+<p><strong>Public Key Uniqueness</strong>:</p>
+<ul>
+<li>If the tag is available, the contract then checks whether the <code>public_key</code> has already been registered with another tag. If the <code>public_key</code> is already associated with a tag, the contract returns the same error.</li>
+</ul>
+</li>
+<li>
+<p><strong>Tag Registration</strong>:</p>
+<ul>
+<li>If both the tag and public key are unique, the contract registers the tag by inserting it into the <code>registry</code> map and creating a reverse lookup in the <code>lookup</code> map. This ensures both the tag-to-public-key and public-key-to-tag mappings are updated.</li>
+</ul>
+</li>
+<li>
+<p><strong>Return</strong>:</p>
+<ul>
+<li>If successful, the function returns <code>Ok(())</code>, indicating the registration was completed without issues.</li>
+</ul>
+</li>
+</ol>
+<h4 id="43-registering-with-ccd"><a class="header" href="#43-registering-with-ccd">4.3 Registering with <code>.ccd</code></a></h4>
+<p>As per the contract’s design, each tag is required to end with <code>.ccd</code>. This suffix helps create a standard for tags across the Concordium network. The contract automatically appends this suffix if the user doesn’t include it when registering.</p>
+<p>Here’s the relevant logic from the contract’s <code>register</code> entry point:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>if !tag.ends_with(".ccd") {
+    tag.push_str(".ccd");
+}
+<span class="boring">}</span></code></pre></pre>
+<p>This ensures that even if a user inputs <code>"alice"</code>, the contract will automatically convert it to <code>"alice.ccd"</code>, maintaining consistency across the platform.</p>
+<h4 id="44-validating-the-registration-request"><a class="header" href="#44-validating-the-registration-request">4.4 Validating the Registration Request</a></h4>
+<p>Before executing the registration, the contract validates that the request is signed by the public key’s owner. This is important for preventing unauthorized tag registrations.</p>
+<p>The signature validation is handled by the <code>validate_signature</code> function:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn validate_signature&lt;T: Serial + IsMessage&gt;(
+    message: &amp;T,
+    signer: PublicKeyEd25519,
+    signature: SignatureEd25519,
+    crypto_primitives: &amp;impl HasCryptoPrimitives,
+    ctx: &amp;ReceiveContext,
+) -&gt; RegistryResult&lt;()&gt; {
+    // Check that the signature is not expired.
+    ensure!(
+        message.expiry_time() &gt; ctx.metadata().slot_time(),
+        Error::Expired
+    );
+
+    // Calculate the message hash.
+    let message_hash: [u8; 32] =
+        calculate_message_hash_from_bytes(&amp;to_bytes(&amp;message), crypto_primitives, ctx)?;
+
+    // Check the signature.
+    let valid_signature =
+        crypto_primitives.verify_ed25519_signature(signer, signature, &amp;message_hash);
+    ensure!(valid_signature, Error::WrongSignature);
+
+    Ok(())
+}
+<span class="boring">}</span></code></pre></pre>
+<p>This function ensures that:</p>
+<ol>
+<li><strong>The message has not expired</strong>: A timestamp (<code>expiry_time</code>) is checked to make sure the registration is still valid.</li>
+<li><strong>The signature is correct</strong>: Using cryptographic primitives, the contract verifies the signature against the user’s public key. If the signature doesn’t match, it returns an error (<code>Error::WrongSignature</code>).</li>
+</ol>
+<p>Only after passing this validation step does the contract proceed to register the tag.</p>
+<h4 id="45-events-and-logs"><a class="header" href="#45-events-and-logs">4.5 Events and Logs</a></h4>
+<p>Once a tag is successfully registered, the contract logs the event to the blockchain. This event is crucial for tracking the registration and providing proof of execution.</p>
+<p>The <code>RegisterEvent</code> structure logs the following data:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Debug, Serial, Deserial, PartialEq, Eq, SchemaType)]
+pub struct RegisterEvent {
+    tag: String,
+    contract_address: AccountAddress,
+    public_key: PublicKeyEd25519,
+    provider: String,
+    registrar: AccountAddress
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Here’s the corresponding part of the <code>register</code> function that emits the event:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>logger.log(&amp;Event::Register(RegisterEvent {
+    tag: message.tag,
+    contract_address: message.data.contract_address,
+    public_key: message.data.public_key,
+    provider: message.data.provider,
+    registrar: ctx.sender(),
+}))?;
+<span class="boring">}</span></code></pre></pre>
+<p>The event contains:</p>
+<ul>
+<li>The registered tag.</li>
+<li>The contract address associated with the public key.</li>
+<li>The public key itself.</li>
+<li>The wallet provider (such as a company managing the contract).</li>
+</ul>
+<p>These events are written to the blockchain’s event log, which can be queried and audited at any time. This creates transparency and traceability for all tag registrations.</p>
+<h4 id="46-error-handling"><a class="header" href="#46-error-handling">4.6 Error Handling</a></h4>
+<p>During registration, various errors can occur. These are handled by the contract’s error system, which returns specific error messages depending on the situation:</p>
+<ul>
+<li><strong><code>Error::TagAlreadyExists</code></strong>: Returned when the tag or public key has already been registered.</li>
+<li><strong><code>Error::WrongSignature</code></strong>: Returned when the user’s signature is invalid.</li>
+<li><strong><code>Error::Expired</code></strong>: Returned when the request has expired based on the provided timestamp.</li>
+</ul>
+<p>These error messages help users understand why their registration failed, allowing them to correct their input or try again later.</p>
+<hr />
+<h3 id="chapter-summary"><a class="header" href="#chapter-summary">Chapter Summary</a></h3>
+<p>In this chapter, we explored the <strong>register</strong> function in detail, from validating signatures to ensuring unique tag and public key combinations. We also discussed how the contract automatically appends <code>.ccd</code> to tags and how it logs successful registrations for transparency and traceability.</p>
+<p>In the next chapter, <strong>Chapter 5: Retrieving Tags and Public Keys</strong>, we’ll examine how to retrieve a tag’s details or look up the tag associated with a public key using the contract’s built-in functions.</p>
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><h3 id="chapter-5-retrieving-tags-and-public-keys"><a class="header" href="#chapter-5-retrieving-tags-and-public-keys">Chapter 5: <strong>Retrieving Tags and Public Keys</strong></a></h3>
+<p>In the previous chapter, we explored how to register a wallet tag with a public key and associated contract information. Now, we’ll turn our attention to the retrieval process: how to query the registry to get the details of a tag or public key.</p>
+<p>The smart contract provides two essential functions for retrieval:</p>
+<ol>
+<li><strong><code>get_key</code></strong>: Retrieves the wallet details given a tag.</li>
+<li><strong><code>get_tag</code></strong>: Performs a reverse lookup to get the tag associated with a given public key.</li>
+</ol>
+<hr />
+<h4 id="51-retrieving-account-details-by-tag-get_key"><a class="header" href="#51-retrieving-account-details-by-tag-get_key">5.1 Retrieving Account Details by Tag: <code>get_key</code></a></h4>
+<p>Once a tag is registered, users or wallet providers may want to query the registry to get the public key and associated contract details for that tag. The function designed for this purpose is <code>get_key</code>.</p>
+<p>Here is the function definition:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[receive(
+    contract = "registry",
+    name = "get_key",
+    parameter = "String",
+    error = "Error",
+)]
+fn get_key(ctx: &amp;ReceiveContext, host: &amp;Host&lt;State&gt;) -&gt; RegistryResult&lt;Registry&gt; {
+    let mut tag: String = ctx.parameter_cursor().get()?;
+    if !tag.ends_with(".ccd") {
+        tag.push_str(".ccd");
+    }
+    host.state.get(tag)
+}
+<span class="boring">}</span></code></pre></pre>
+<h5 id="511-function-workflow"><a class="header" href="#511-function-workflow">5.1.1 Function Workflow</a></h5>
+<ol>
+<li>
+<p><strong>Parameter Parsing</strong>:</p>
+<ul>
+<li>The function accepts a tag as its input parameter, which is provided by the user or wallet provider.</li>
+<li>The contract first parses the input to retrieve the tag. If the tag does not already end with <code>.ccd</code>, the contract appends this suffix automatically to ensure the tag conforms to the CIS5 wallet standard.</li>
+</ul>
+</li>
+<li>
+<p><strong>Tag Lookup</strong>:</p>
+<ul>
+<li>After processing the tag, the contract checks its internal registry to find the details associated with the tag.</li>
+<li>It uses the <code>host.state.get(tag)</code> method to query the <code>State</code> map and retrieve the <code>Registry</code> object linked to the tag. If the tag is not found, the contract returns an error (<code>Error::TagDoesNotExist</code>).</li>
+</ul>
+</li>
+<li>
+<p><strong>Return</strong>:</p>
+<ul>
+<li>If the tag exists, the contract returns the corresponding <code>Registry</code> object, which includes:
+<ul>
+<li>The public key.</li>
+<li>The smart contract wallet address.</li>
+<li>The wallet provider.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h5 id="512-sample-usage-scenario"><a class="header" href="#512-sample-usage-scenario">5.1.2 Sample Usage Scenario</a></h5>
+<p>Consider a wallet provider that needs to send tokens to a user registered in the CIS5 wallet registry. Instead of asking the user for their public key and contract details, the provider can use the user’s tag (e.g., <code>"alice.ccd"</code>) to query the contract via <code>get_key</code>.</p>
+<p>For example, the provider could invoke the <code>get_key</code> function with the following input:</p>
+<pre><code class="language-json">"alice"
+</code></pre>
+<p>The contract would return:</p>
+<pre><code class="language-json">{
+    "public_key": "ed25519:9cf7b748...",
+    "contract_address": "ccd1qqx...",
+    "provider": "MyWalletApp"
+}
+</code></pre>
+<p>The provider can now send tokens to <code>"alice.ccd"</code> without requiring manual input from the user.</p>
+<hr />
+<h4 id="52-reverse-lookup-by-public-key-get_tag"><a class="header" href="#52-reverse-lookup-by-public-key-get_tag">5.2 Reverse Lookup by Public Key: <code>get_tag</code></a></h4>
+<p>In some cases, users or wallet providers might have a public key but not the corresponding tag. The <code>get_tag</code> function enables reverse lookup, allowing anyone to retrieve the tag associated with a given public key.</p>
+<p>Here’s the function definition:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[receive(
+    contract = "registry",
+    name = "get_tag",
+    parameter = "PublicKeyEd25519",
+    error = "Error",
+)]
+fn get_tag(ctx: &amp;ReceiveContext, host: &amp;Host&lt;State&gt;) -&gt; RegistryResult&lt;String&gt; {
+    let key: PublicKeyEd25519 = ctx.parameter_cursor().get()?;
+    host.state.get_tag(key)
+}
+<span class="boring">}</span></code></pre></pre>
+<h5 id="521-function-workflow"><a class="header" href="#521-function-workflow">5.2.1 Function Workflow</a></h5>
+<ol>
+<li>
+<p><strong>Parameter Parsing</strong>:</p>
+<ul>
+<li>The <code>get_tag</code> function accepts a public key as input, specifically of type <code>PublicKeyEd25519</code>.</li>
+<li>The contract parses this parameter from the input, ensuring the public key is correctly formatted.</li>
+</ul>
+</li>
+<li>
+<p><strong>Public Key Lookup</strong>:</p>
+<ul>
+<li>After extracting the public key, the contract checks its internal lookup table to see if there is a tag associated with this key.</li>
+<li>It uses the <code>host.state.get_tag(key)</code> method to perform this reverse lookup in the <code>lookup</code> map. If no tag exists for the public key, the contract returns an error (<code>Error::KeyDoesNotExist</code>).</li>
+</ul>
+</li>
+<li>
+<p><strong>Return</strong>:</p>
+<ul>
+<li>If the public key exists, the contract returns the tag associated with it, such as <code>"alice.ccd"</code>. This tag can then be used for further queries or transactions.</li>
+</ul>
+</li>
+</ol>
+<h5 id="522-sample-usage-scenario"><a class="header" href="#522-sample-usage-scenario">5.2.2 Sample Usage Scenario</a></h5>
+<p>Consider a scenario where a wallet provider has a user’s public key (<code>ed25519:9cf7b748...</code>) but does not know the associated tag. To simplify the transaction process, the provider can perform a reverse lookup using the <code>get_tag</code> function.</p>
+<p>The input would look like this:</p>
+<pre><code class="language-json">"ed25519:9cf7b748..."
+</code></pre>
+<p>The contract would return:</p>
+<pre><code class="language-json">"alice.ccd"
+</code></pre>
+<p>With the tag <code>"alice.ccd"</code>, the provider can then look up additional details or use it for transactions.</p>
+<hr />
+<h4 id="53-error-handling-in-retrieval"><a class="header" href="#53-error-handling-in-retrieval">5.3 Error Handling in Retrieval</a></h4>
+<p>Both <code>get_key</code> and <code>get_tag</code> functions include error handling mechanisms that return appropriate errors when a tag or public key is not found.</p>
+<ol>
+<li>
+<p><strong><code>Error::TagDoesNotExist</code></strong>:</p>
+<ul>
+<li>This error is triggered when a tag lookup fails, meaning the tag provided is not registered in the contract.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>Error::KeyDoesNotExist</code></strong>:</p>
+<ul>
+<li>This error occurs during reverse lookup when a public key is not found in the <code>lookup</code> map.</li>
+</ul>
+</li>
+</ol>
+<p>These errors help users and providers quickly identify issues and take corrective action, whether it’s rechecking the tag or public key, or informing the user that they need to register their wallet first.</p>
+<hr />
+<h3 id="chapter-summary-1"><a class="header" href="#chapter-summary-1">Chapter Summary</a></h3>
+<p>In this chapter, we’ve explored the two main retrieval functions of the CIS5 wallet registry:</p>
+<ul>
+<li><strong><code>get_key</code></strong>: Retrieves wallet details based on a tag.</li>
+<li><strong><code>get_tag</code></strong>: Performs a reverse lookup to retrieve the tag associated with a public key.</li>
+</ul>
+<p>These functions simplify asset transfers by removing the need for manual input and reducing the risk of errors. By utilizing the <code>.ccd</code> tag standard, wallet providers and users can securely and efficiently interact with the registry.</p>
+<p>In the next chapter, <strong>Chapter 6: Security Considerations</strong>, we’ll examine the security features of the contract, including signature verification and nonce management, and how they protect the integrity of the registry.</p>
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><h3 id="chapter-6-security-considerations-revised"><a class="header" href="#chapter-6-security-considerations-revised">Chapter 6: <strong>Security Considerations (Revised)</strong></a></h3>
+<p>When dealing with a smart contract registry that stores sensitive information like public keys and wallet addresses, security is paramount. In this chapter, we will discuss the built-in security mechanisms of the CIS5 wallet registry, including signature verification and error handling. These features ensure that only authorized parties can interact with the registry, and that the data integrity is maintained throughout the lifecycle of the contract.</p>
+<hr />
+<h4 id="61-signature-verification"><a class="header" href="#61-signature-verification">6.1 Signature Verification</a></h4>
+<p>The contract relies heavily on <strong>signature verification</strong> to ensure that actions like registering a wallet tag or retrieving sensitive information can only be performed by authorized entities. In the registry, <strong>Ed25519 signatures</strong> are used to secure messages and prove ownership of the corresponding public keys.</p>
+<h5 id="611-validating-signatures"><a class="header" href="#611-validating-signatures">6.1.1 Validating Signatures</a></h5>
+<p>The key function responsible for validating signatures in this contract is <code>validate_signature</code>. This function checks that the message was indeed signed by the owner of the provided public key and that the signature has not expired.</p>
+<p>Here’s the relevant code:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn validate_signature&lt;T: Serial + IsMessage&gt;(
+    message: &amp;T,
+    signer: PublicKeyEd25519,
+    signature: SignatureEd25519,
+    crypto_primitives: &amp;impl HasCryptoPrimitives,
+    ctx: &amp;ReceiveContext,
+) -&gt; RegistryResult&lt;()&gt; {
+    // Check that the signature is not expired.
+    ensure!(
+        message.expiry_time() &gt; ctx.metadata().slot_time(),
+        Error::Expired
+    );
+
+    // Calculate the message hash.
+    let message_hash: [u8; 32] =
+        calculate_message_hash_from_bytes(&amp;to_bytes(&amp;message), crypto_primitives, ctx)?;
+
+    // Check the signature.
+    let valid_signature =
+        crypto_primitives.verify_ed25519_signature(signer, signature, &amp;message_hash);
+    ensure!(valid_signature, Error::WrongSignature);
+
+    Ok(())
+}
+<span class="boring">}</span></code></pre></pre>
+<h5 id="612-steps-in-signature-verification"><a class="header" href="#612-steps-in-signature-verification">6.1.2 Steps in Signature Verification</a></h5>
+<ol>
+<li>
+<p><strong>Message Expiry</strong>:</p>
+<ul>
+<li>First, the function checks whether the message has expired. This is critical to prevent replay attacks, where an old message is resent to the contract in an attempt to manipulate the state. If the message’s expiry time has passed, the contract returns the <code>Error::Expired</code> error.</li>
+</ul>
+</li>
+<li>
+<p><strong>Message Hash Calculation</strong>:</p>
+<ul>
+<li>The contract then calculates the hash of the message. This hash is used to verify the signature and ensure that the message has not been tampered with.</li>
+</ul>
+</li>
+<li>
+<p><strong>Signature Validation</strong>:</p>
+<ul>
+<li>Finally, the contract checks the validity of the signature using the <code>verify_ed25519_signature</code> function. If the signature does not match the signer’s public key, the contract returns the <code>Error::WrongSignature</code> error.</li>
+</ul>
+</li>
+</ol>
+<p>By following this process, the contract ensures that only authorized users (i.e., those with valid signatures) can interact with it.</p>
+<h5 id="613-why-ed25519"><a class="header" href="#613-why-ed25519">6.1.3 Why Ed25519?</a></h5>
+<p>The <strong>Ed25519</strong> signature scheme is chosen for its strong security properties, including resistance to attacks on elliptic curve cryptography and speed in verifying signatures. It is widely used in blockchain applications due to these strengths and its compact key sizes.</p>
+<hr />
+<h4 id="62-error-handling-for-security"><a class="header" href="#62-error-handling-for-security">6.2 Error Handling for Security</a></h4>
+<p>The contract includes several error handling mechanisms that ensure it operates securely and reliably. These error messages are returned when certain security checks fail, allowing users and wallet providers to understand what went wrong and take corrective action.</p>
+<h5 id="621-key-errors-and-their-purpose"><a class="header" href="#621-key-errors-and-their-purpose">6.2.1 Key Errors and Their Purpose</a></h5>
+<ol>
+<li>
+<p><strong><code>Error::Expired</code></strong>:</p>
+<ul>
+<li>This error is triggered when a message is submitted after its expiry time. It prevents old messages from being replayed and ensures that only recent, valid transactions are processed.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>Error::WrongSignature</code></strong>:</p>
+<ul>
+<li>If the signature verification fails (i.e., the signature does not match the public key), the contract returns this error. This prevents unauthorized users from submitting messages on behalf of others.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>Error::TagAlreadyExists</code></strong>:</p>
+<ul>
+<li>This error occurs when a user tries to register a tag that already exists in the contract. It ensures the uniqueness of tags and prevents key duplication.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>Error::KeyDoesNotExist</code></strong> and <strong><code>Error::TagDoesNotExist</code></strong>:</p>
+<ul>
+<li>These errors are returned when a user tries to look up a key or tag that is not registered in the contract. This prevents unauthorized or erroneous access to the contract’s state.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h4 id="63-additional-security-considerations"><a class="header" href="#63-additional-security-considerations">6.3 Additional Security Considerations</a></h4>
+<p>While signature verification is one of the most critical aspects of security in this contract, other practices help ensure the contract’s overall security and integrity:</p>
+<ol>
+<li>
+<p><strong>No Mutable External Calls</strong>:</p>
+<ul>
+<li>The contract does not make any external calls during state changes that could modify the state of other contracts. This limits its attack surface and reduces the risk of reentrancy attacks.</li>
+</ul>
+</li>
+<li>
+<p><strong>Limited Entry Points</strong>:</p>
+<ul>
+<li>The contract exposes only three core entry points (<code>register</code>, <code>get_key</code>, and <code>get_tag</code>). By keeping the interface minimal, the contract limits the potential for security vulnerabilities and reduces the complexity of interactions.</li>
+</ul>
+</li>
+<li>
+<p><strong>Testing and Auditing</strong>:</p>
+<ul>
+<li>Rigorous testing of the contract’s functionality and security features is essential before deployment. Audits by independent security experts can help identify any potential vulnerabilities or weaknesses in the contract’s design.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="chapter-summary-2"><a class="header" href="#chapter-summary-2">Chapter Summary</a></h3>
+<p>In this chapter, we explored the key security features of the CIS5 wallet registry contract:</p>
+<ul>
+<li><strong>Signature Verification</strong> ensures that only authorized users can interact with the contract.</li>
+<li><strong>Error Handling</strong> provides clear feedback when security checks fail, allowing users to understand and resolve issues.</li>
+<li><strong>Additional Security Practices</strong> like limiting entry points and avoiding mutable external calls further enhance the contract’s robustness.</li>
+</ul>
+<p>Together, these mechanisms provide a secure and reliable foundation for the CIS5 wallet registry, protecting users and their assets from unauthorized access and manipulation.</p>
+<p>In the next chapter, <strong>Chapter 7: Deployment and Usage</strong>, we’ll guide you through deploying the contract on the Concordium network and demonstrate how to interact with it in a live environment.</p>
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><h3 id="chapter-7-interacting-with-the-contract"><a class="header" href="#chapter-7-interacting-with-the-contract">Chapter 7: <strong>Interacting with the Contract</strong></a></h3>
+<p>In this chapter, we will explore how users and wallet providers can interact with the CIS5 wallet registry smart contract after it has been deployed. This includes the functionalities for registering wallet tags, retrieving wallet details, and conducting reverse lookups for tags associated with public keys. We will also cover best practices for using the contract effectively.</p>
+<blockquote>
+<p>This chapter assumes that you have worked with the concordium <code>@concordium/ccd-js-gen</code> and <code>@concordium/web-sdk</code> in the past or atleast in theory. if not please refer to this <a href="https://medium.com/@buki.offor/concordium-full-stack-smart-contract-account-tutorial-part-two-2aa6fb81f2b7">tutorial</a></p>
+</blockquote>
+<hr />
+<h4 id="71-registering-a-wallet-tag"><a class="header" href="#71-registering-a-wallet-tag">7.1 Registering a Wallet Tag</a></h4>
+<p>To register a new wallet tag, a user must call the <code>register</code> function of the contract, providing their public key, signature, and the desired tag. Here’s a detailed breakdown of how this interaction occurs.</p>
+<h5 id="711-preparing-the-registration-message"><a class="header" href="#711-preparing-the-registration-message">7.1.1 Preparing the Registration Message</a></h5>
+<p>Before making the call, users need to create a <code>RegisterMessage</code>. This message includes the signer’s public key, the signature for authentication, and the registration details encapsulated in a <code>RegisterParam</code>. Here’s an example of how to construct this message:</p>
+<pre><code class="language-ts">// creates the register object parameter
+const param: Registry.RegisterParameter = {
+	message: {
+		data: {
+			contract_address: ContractAddress.create(100, 0), //address of the smartwallet that operates this key
+			provider: "AfrixLabs",
+			public_key:"c82ce198a0595e621d9ab066b3950b78efbeea4eecfaf246bc3e0238d8d6d799",
+		},
+		expiry_time: Timestamp.futureMinutes(15),
+		tag: "buki.ccd",
+	},
+	signature:"5ac312ac52171a91866e3e9de7bfe7caa24cc9385175f6718b3df00b912bd0e2b300a0e684e1d461b2de2a79d1149f04923b7b338dcfbfb2493b214d9683c70d",
+   signer:"c82ce198a0595e621d9ab066b3950b78efbeea4eecfaf246bc3e0238d8d6d799",
+};
+</code></pre>
+<h5 id="712-calling-the-register-function"><a class="header" href="#712-calling-the-register-function">7.1.2 Calling the Register Function</a></h5>
+<p>With the registration message prepared, users can call the contract’s <code>register</code> function. If successful, the tag will be stored on-chain, and the contract will log an event:</p>
+<pre><code class="language-ts">// create an instance of the contract address
+const contractAddr = ContractAddress.create(10289);
+const contract = Registry.createUnchecked(this.grpc, contractAddr)
+
+// simulate a registeration to confirm if the transaction will be successfull 
+const response = await Registry.dryRunRegister(contract, param)
+
+// check the output
+if (!response || response.tag === 'failure' || !response.returnValue) {
+   const parsedErrorCode = Registry.parseErrorMessageRegister(response)?.type;
+   return { status: false, message: JSON.stringify(parsedErrorCode) }
+}
+// gas fee
+const maxContractExecutionEnergy = Energy.create(response.usedEnergy.value + BigInt(200));
+
+// construct metadata object
+const metadata: ContractTransactionMetadata = {
+         amount: CcdAmount.zero(),
+         senderAddress: AccountAddress.fromBase58("38TN6fTCjgHYp7vXDagLJsb6s3UHzDANaGS2wXwgQLBUJrEian"),
+         energy: maxContractExecutionEnergy
+   }
+
+// send the actual transaction
+await Registry.sendRegister(contract, metadata, param, this.signer);
+</code></pre>
+<p>If the tag already exists, the contract will return an <code>Error::TagAlreadyExists</code>, ensuring that each public key is associated with a unique tag.</p>
+<hr />
+<h4 id="72-retrieving-wallet-details"><a class="header" href="#72-retrieving-wallet-details">7.2 Retrieving Wallet Details</a></h4>
+<p>Users can easily retrieve the details associated with their registered tag by invoking the <code>get_key</code> function. This function takes a string as input and returns the corresponding <code>Registry</code> object, which contains important information about the user's wallet.</p>
+<h5 id="721-using-the-get-key-function"><a class="header" href="#721-using-the-get-key-function">7.2.1 Using the Get Key Function</a></h5>
+<p>To query the contract for wallet details, users should ensure their tag ends with <code>.ccd</code>, which indicates a registered wallet tag. Here’s how to call the <code>get_key</code> function:</p>
+<pre><code class="language-ts">const contractAddr = ContractAddress.create(10289);
+
+const contract = Registry.createUnchecked(this.grpc, contractAddr)
+
+let tag: Registry.GetKeyParameter = "buki.ccd";
+
+// simulate the transaction request
+const result = await Registry.dryRunGetKey(contract,tag);
+
+return result;
+</code></pre>
+<p>If the tag exists in the registry, the function will return the <code>Registry</code> object with the user’s public key, contract address, and provider information. If the tag does not exist, an <code>Error::TagDoesNotExist</code> will be returned.</p>
+<hr />
+<h4 id="73-reverse-lookup-for-tag"><a class="header" href="#73-reverse-lookup-for-tag">7.3 Reverse Lookup for Tag</a></h4>
+<p>For users who want to find their registered tag based on their public key, the <code>get_tag</code> function allows them to perform a reverse lookup. This functionality is crucial for users who may forget their tags or want to verify their registered information.</p>
+<h5 id="731-calling-the-get-tag-function"><a class="header" href="#731-calling-the-get-tag-function">7.3.1 Calling the Get Tag Function</a></h5>
+<p>To retrieve the tag associated with a given public key, users simply need to call the <code>get_tag</code> function:</p>
+<pre><code class="language-ts">const contractAddr = ContractAddress.create(10289);
+const contract = Registry.createUnchecked(this.grpc, contractAddr)
+const key: Registry.GetTagParameter = 'c82ce198a0595e621d9ab066b3950b78efbeea4eecfaf246bc3e0238d8d6d799';
+const result = await Registry.dryRunGetTag(contract,key);
+return result;
+</code></pre>
+<p>This function will return the associated tag if the public key exists in the registry. If not, it will return an <code>Error::KeyDoesNotExist</code>, ensuring that users have clear feedback on the validity of their query.</p>
+<hr />
+<h4 id="74-best-practices-for-usage"><a class="header" href="#74-best-practices-for-usage">7.4 Best Practices for Usage</a></h4>
+<p>When interacting with the CIS5 wallet registry contract, users should follow these best practices to ensure a smooth experience:</p>
+<ol>
+<li>
+<p><strong>Tag Uniqueness</strong>:</p>
+<ul>
+<li>Always check that the desired tag does not already exist before attempting to register it. This prevents unnecessary errors and ensures clarity in the registry.</li>
+</ul>
+</li>
+<li>
+<p><strong>Correct Tag Formatting</strong>:</p>
+<ul>
+<li>Ensure that all tags used in registration and queries end with <code>.ccd</code>. This helps maintain a consistent format and avoids lookup issues. Also users should keep the tag length prefarable under 12 characters, this is not enforced by the contract though.</li>
+</ul>
+</li>
+<li>
+<p><strong>Secure Key Management</strong>:</p>
+<ul>
+<li>Users should store their private keys securely. Never share private keys or signatures publicly, as this can compromise wallet security.</li>
+</ul>
+</li>
+<li>
+<p><strong>Thorough Testing</strong>:</p>
+<ul>
+<li>Always test interactions in a safe environment before relying on them for actual transactions. This is crucial for understanding how the contract behaves under various conditions.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="chapter-summary-3"><a class="header" href="#chapter-summary-3">Chapter Summary</a></h3>
+<p>In this chapter, we explored the ways users can interact with the CIS5 wallet registry smart contract, focusing on:</p>
+<ul>
+<li><strong>Registering Wallet Tags</strong>: How to prepare and submit registration messages to the contract.</li>
+<li><strong>Retrieving Wallet Details</strong>: Using the <code>get_key</code> function to access wallet information based on tags.</li>
+<li><strong>Reverse Lookups for Tags</strong>: How to use the <code>get_tag</code> function to find tags associated with public keys.</li>
+<li><strong>Best Practices for Usage</strong>: Key recommendations for ensuring secure and effective interactions with the contract.</li>
+</ul>
+<p>In the next chapter, <strong>Chapter 8: Real-World Applications</strong>, we will delve into potential use cases for the CIS5 wallet registry, exploring how it can simplify user onboarding and asset transfers in various blockchain applications.</p>
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><h3 id="chapter-8-real-world-applications"><a class="header" href="#chapter-8-real-world-applications">Chapter 8: <strong>Real-World Applications</strong></a></h3>
+<p>In this chapter, we will explore various real-world applications of the CIS5 wallet registry smart contract. By simplifying the management of wallet tags and enhancing user onboarding processes, this contract has the potential to facilitate numerous use cases in blockchain applications. We will discuss how wallet providers, developers, and end-users can leverage the registry to improve their experiences in the decentralized ecosystem.</p>
+<hr />
+<h4 id="81-simplifying-user-onboarding"><a class="header" href="#81-simplifying-user-onboarding">8.1 Simplifying User Onboarding</a></h4>
+<p>One of the most significant challenges in blockchain adoption is the onboarding process for new users. Wallet addresses, especially those based on complex cryptographic keys, can be intimidating and confusing. The CIS5 wallet registry addresses this issue by allowing users to register human-readable tags associated with their public keys.</p>
+<h5 id="811-user-friendly-wallet-tags"><a class="header" href="#811-user-friendly-wallet-tags">8.1.1 User-Friendly Wallet Tags</a></h5>
+<p>By enabling users to create simple, memorable tags (e.g., <code>alice.ccd</code> instead of a lengthy public key), the registry fosters a more user-friendly environment. This approach lowers the barrier to entry for newcomers, allowing them to engage with blockchain technology more comfortably. Third-party wallet providers can integrate this functionality, allowing users to send and receive assets using their human-readable tags.</p>
+<hr />
+<h4 id="82-streamlined-asset-transfers"><a class="header" href="#82-streamlined-asset-transfers">8.2 Streamlined Asset Transfers</a></h4>
+<p>The CIS5 wallet registry can significantly enhance the efficiency of asset transfers between users. With human-readable tags, wallet providers can implement features that allow users to initiate transactions without needing to copy and paste lengthy public keys.</p>
+<h5 id="821-transaction-flow-enhancement"><a class="header" href="#821-transaction-flow-enhancement">8.2.1 Transaction Flow Enhancement</a></h5>
+<p>Consider the following transaction flow facilitated by the registry:</p>
+<ol>
+<li>
+<p><strong>Sender Initiates Transfer</strong>:</p>
+<ul>
+<li>A user wants to send tokens to another user. Instead of needing the recipient's public key, they can simply enter the recipient's tag (e.g., <code>bob.ccd</code>).</li>
+</ul>
+</li>
+<li>
+<p><strong>Wallet Provider Lookup</strong>:</p>
+<ul>
+<li>The wallet provider queries the CIS5 wallet registry using the recipient's tag, retrieving the associated public key.</li>
+</ul>
+</li>
+<li>
+<p><strong>Transaction Execution</strong>:</p>
+<ul>
+<li>With the correct public key obtained, the wallet provider completes the transaction on behalf of the sender, ensuring the transfer is executed without errors.</li>
+</ul>
+</li>
+</ol>
+<p>This streamlined process reduces the likelihood of human error and enhances the overall user experience.</p>
+<hr />
+<h4 id="83-interoperability-across-wallets"><a class="header" href="#83-interoperability-across-wallets">8.3 Interoperability Across Wallets</a></h4>
+<p>The CIS5 wallet registry's design promotes interoperability among various wallet providers that choose to adopt the standard. This functionality enables users to seamlessly transfer assets across different platforms while retaining the simplicity of using human-readable tags. But there are certain restrictions on what a wallet can do.</p>
+<h5 id="831-cross-platform-compatibility"><a class="header" href="#831-cross-platform-compatibility">8.3.1 Cross-Platform Compatibility</a></h5>
+<p>Imagine a scenario where a user switches wallet providers:</p>
+<ol>
+<li>
+<p><strong>Tag Registration</strong>:</p>
+<ul>
+<li>The user initially registers their tag with Provider A.</li>
+</ul>
+</li>
+<li>
+<p><strong>Switching Providers</strong>:</p>
+<ul>
+<li>If the user decides to switch to Provider B, they cannot use the same tag (<code>alice.ccd</code>) to receive assets. Ideally the user should be able to migrate their wallet across providers but, the contract specifically prevents this. The cis5 wallet standard does not aim to replace the network's account type system; hence these restrictions.</li>
+</ul>
+</li>
+</ol>
+<p>This interoperability encourages wallet providers to adopt the CIS5 standard, creating a more cohesive user experience across the blockchain ecosystem albeit with certain design restrictions.</p>
+<hr />
+<h4 id="84-third-party-integrations"><a class="header" href="#84-third-party-integrations">8.4 Third-Party Integrations</a></h4>
+<p>The CIS5 wallet registry can also facilitate integrations with various decentralized applications (dApps). By querying the registry, dApps can easily access wallet information and enhance their user interfaces.</p>
+<h5 id="841-dapp-development-use-cases"><a class="header" href="#841-dapp-development-use-cases">8.4.1 dApp Development Use Cases</a></h5>
+<ol>
+<li>
+<p><strong>Gaming</strong>: In a blockchain-based game, users can register their tags to represent their in-game characters. Other players can send in-game assets using these tags, making transactions more intuitive.</p>
+</li>
+<li>
+<p><strong>DeFi Platforms</strong>: Decentralized finance applications can leverage the registry to simplify asset transfers and loan agreements. Users can interact using tags, which makes participating in DeFi activities easier and less error-prone.</p>
+</li>
+<li>
+<p><strong>NFT Marketplaces</strong>: Users can register tags for their wallets that hold NFTs, allowing collectors to buy and sell NFTs using memorable tags instead of public keys.</p>
+</li>
+</ol>
+<hr />
+<h3 id="chapter-summary-4"><a class="header" href="#chapter-summary-4">Chapter Summary</a></h3>
+<p>In this chapter, we explored the real-world applications of the CIS5 wallet registry smart contract, focusing on:</p>
+<ul>
+<li><strong>Simplifying User Onboarding</strong>: How human-readable tags lower barriers to entry for new users.</li>
+<li><strong>Streamlined Asset Transfers</strong>: The efficiency of using tags to facilitate asset transactions.</li>
+<li><strong>Interoperability Across Wallets</strong>: The restriction of maintaining consistent tag usage across different platforms/providers.</li>
+<li><strong>Third-Party Integrations</strong>: Potential use cases in gaming, DeFi, and NFT markets.</li>
+<li><strong>Enhancing Security and Privacy</strong>: How the registry can improve user anonymity and reduce exposure.</li>
+</ul>
+<p>In the next chapter, <strong>Chapter 9: Future Developments</strong>, we will discuss potential improvements to the CIS5 wallet registry standard, addressing scalability, security enhancements, and broader community adoption.</p>
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><h3 id="chapter-9-conclusion"><a class="header" href="#chapter-9-conclusion">Chapter 9: <strong>Conclusion</strong></a></h3>
+<p>The CIS5 wallet registry represents a significant advancement in the management of smart contract wallets, offering a user-friendly interface that bridges the gap between complex cryptographic keys and human-readable identifiers. Throughout this book, we have explored the intricacies of the CIS5 wallet registry, its potential applications, and the benefits it brings to users, developers, and the broader blockchain ecosystem.</p>
+<hr />
+<h4 id="91-key-takeaways"><a class="header" href="#91-key-takeaways">9.1 Key Takeaways</a></h4>
+<ol>
+<li>
+<p><strong>User-Centric Design</strong>: By allowing users to register human-readable tags for their public keys, the CIS5 wallet registry simplifies interactions within the blockchain space. This design choice enhances user experience and encourages wider adoption of blockchain technologies.</p>
+</li>
+<li>
+<p><strong>Streamlined Transactions</strong>: The registry facilitates efficient asset transfers, reducing the likelihood of human error associated with managing long public keys. This improvement is crucial for onboarding new users who may find traditional blockchain transactions daunting.</p>
+</li>
+<li>
+<p><strong>Future Potential</strong>: The CIS5 wallet registry is not static; it is designed to evolve with the needs of its users and the demands of the blockchain ecosystem. The proposed scalability improvements, enhanced security measures, and focus on community engagement will ensure its continued relevance.</p>
+</li>
+<li>
+<p><strong>Community and Ecosystem Impact</strong>: The success of the CIS5 wallet registry depends on its adoption by developers, wallet providers, and users. By fostering collaboration and community involvement, we can cultivate a thriving ecosystem that benefits all participants.</p>
+</li>
+</ol>
+<hr />
+<h4 id="92-the-road-ahead"><a class="header" href="#92-the-road-ahead">9.2 The Road Ahead</a></h4>
+<p>As we look to the future, the CIS5 wallet registry stands poised to play a vital role in the ongoing development of blockchain technology. By prioritizing user experience, security, and community engagement, we can create an inclusive environment that empowers users and accelerates the adoption of decentralized solutions.</p>
+<p>The journey does not end here. We invite developers, researchers, and enthusiasts to contribute to the evolution of the CIS5 wallet registry. By sharing insights, ideas, and innovations, we can collectively enhance the functionality and reach of this standard, ensuring it meets the needs of a diverse and growing user base.</p>
+<hr />
+<h4 id="93-final-thoughts"><a class="header" href="#93-final-thoughts">9.3 Final Thoughts</a></h4>
+<p>The CIS5 wallet registry is more than just a smart contract; it represents a vision for a more accessible and user-friendly blockchain experience. By simplifying wallet management and enabling seamless interactions across platforms, we are paving the way for broader adoption of blockchain technology. As we continue to explore the possibilities of decentralized finance, asset management, and digital identity, the CIS5 wallet registry will be an essential tool in bridging the gap between users and the blockchain.</p>
+<p>Thank you for joining us on this journey through the CIS5 wallet registry. We hope this book has provided valuable insights into its design, functionality, and potential impact on the future of blockchain.</p>
+<hr />
+<h3 id="acknowledgments"><a class="header" href="#acknowledgments">Acknowledgments</a></h3>
+<p>We would like to express our gratitude to the developers, researchers, and community members who contributed their time and expertise to the creation of this smart contract and the development of this book. Your insights and dedication have been invaluable in shaping the CIS5 wallet registry into a robust and effective solution for wallet management.</p>
+<hr />
+<h3 id="appendix"><a class="header" href="#appendix">Appendix</a></h3>
+<h4 id="references"><a class="header" href="#references">References</a></h4>
+<ul>
+<li><a href="http://proposals.concordium.software/CIS/cis-5.html">CIS5 Wallet Standard Documentation</a></li>
+<li><a href="https://developer.concordium.software/en/mainnet/smart-contracts/guides/build-schema.html">Concordium Smart Contract Documentation</a></li>
+</ul>
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><p>Here is a list of the contributors who have helped in writing and editing this documentation!</p>
+<ul>
+<li><a href="https://github.com/BukiOffor">Buki</a></li>
+<li><a href="https://ng.linkedin.com/in/stella-odurukwe-4b0791235">Stels</a></li>
+<li><a href="https://github.com/NdukwuCynthia">Cynthia</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>

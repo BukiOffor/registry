@@ -1,0 +1,302 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Understanding the CIS5 Wallet Registry - Concordium Smart Wallet Registry</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="overview.html">Overview</a></li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="chapter_2.html" class="active"><strong aria-hidden="true">2.</strong> Understanding the CIS5 Wallet Registry</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">3.</strong> Deploying and Initializing a Smart Contract</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">4.</strong> Registering Wallet Tags</a></li><li class="chapter-item expanded "><a href="chapter_5.html"><strong aria-hidden="true">5.</strong> Retrieving Tags and Public Keys</a></li><li class="chapter-item expanded "><a href="chapter_6.html"><strong aria-hidden="true">6.</strong> Security Considerations (Revised)</a></li><li class="chapter-item expanded "><a href="chapter_7.html"><strong aria-hidden="true">7.</strong> Interacting with the Registry</a></li><li class="chapter-item expanded "><a href="chapter_8.html"><strong aria-hidden="true">8.</strong> Real-World Applications</a></li><li class="chapter-item expanded "><a href="chapter_9.html"><strong aria-hidden="true">9.</strong> Conclusion</a></li><li class="chapter-item expanded affix "><a href="Contributors.html">Contributors</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Concordium Smart Wallet Registry</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h3 id="chapter-2-understanding-the-cis5-wallet-registry"><a class="header" href="#chapter-2-understanding-the-cis5-wallet-registry">Chapter 2: <strong>Understanding the CIS5 Wallet Registry</strong></a></h3>
+<p>The CIS5 wallet standard is designed to streamline blockchain transactions by providing a standardized way of handling public keys and smart contracts. However, its use becomes much more practical when combined with a system that allows these cryptographic public keys to be associated with human-readable tags. This is where the wallet registry comes in.</p>
+<p>In this chapter, we will break down the CIS5 wallet registry smart contract step by step, explaining its functionality and importance within the broader context of blockchain technology. We’ll also dive into the core features of the contract, its structure, and its interactions on the Concordium blockchain.</p>
+<h4 id="21-what-is-the-cis5-wallet-standard"><a class="header" href="#21-what-is-the-cis5-wallet-standard">2.1 What is the CIS5 Wallet Standard?</a></h4>
+<p>The CIS5 wallet standard defines a structure for managing blockchain wallets on Concordium. At its core, it allows users to control a wallet through a specific type of cryptographic key, <code>PublicKeyEd25519</code>, which is known for its security and efficiency in signing digital signatures.</p>
+<p>However, as secure as this key may be, it remains unreadable to humans. The CIS5 standard enables decentralized wallets but does not offer a way to make these keys more user-friendly. This limitation makes it difficult for users to interact with the blockchain without directly managing these complex keys and there coresponding smart contract wallets.</p>
+<p>The CIS5 wallet registry is built to overcome this limitation by allowing users to create a unique tag associated with their public key. This tag, such as <code>user123.ccd</code>, becomes a recognizable identifier that users can easily share, reducing the risk of human error when transferring assets or interacting with smart contracts.</p>
+<h4 id="22-purpose-of-the-wallet-registry"><a class="header" href="#22-purpose-of-the-wallet-registry">2.2 Purpose of the Wallet Registry</a></h4>
+<p>The wallet registry serves several purposes within a blockchain environment:</p>
+<ol>
+<li>
+<p><strong>Human Readability:</strong> Instead of dealing with long, cryptographic strings, users can register a simple, memorable tag, which is appended with <code>.ccd</code> to signify that it is a registered CIS5 wallet address. For example, a user could register <code>alice.ccd</code> instead of having to use their public key.</p>
+</li>
+<li>
+<p><strong>Standardized Lookup System:</strong> Once registered, these tags can be queried by other smart contracts or wallets to retrieve the associated public key and wallet information. This creates a standard system where any wallet provider that supports the CIS5 standard can interact with the registry seamlessly.</p>
+</li>
+<li>
+<p><strong>Error Reduction:</strong> By using a human-readable tag instead of a complex cryptographic key, the registry reduces the likelihood of errors during transactions. Users no longer need to worry about copying and pasting their public keys, which can lead to costly mistakes if done incorrectly.</p>
+</li>
+<li>
+<p><strong>Interoperability:</strong> While various wallets and smart contracts can operate independently on the blockchain, the wallet registry provides a unified system for managing wallet information across different platforms and providers. Any wallet or app that supports the CIS5 standard can easily query the registry for details about a specific tag.</p>
+</li>
+</ol>
+<h4 id="23-the-core-features-of-the-smart-contract"><a class="header" href="#23-the-core-features-of-the-smart-contract">2.3 The Core Features of the Smart Contract</a></h4>
+<p>The CIS5 wallet registry smart contract is designed with three key operations:</p>
+<ol>
+<li>
+<p><strong>Registering a Tag:</strong>
+The <code>register</code> function allows a user to associate a human-readable tag with their public key. This tag is unique and cannot be changed once registered. The function ensures that each public key can only be associated with one tag, preventing duplicate entries or accidental overwrites. This function is trustless because each wallet data is pre-signed by the corresponding private key that claims to hold this public key. This signature is verified on chain before the registeration occurs.</p>
+</li>
+<li>
+<p><strong>Retrieving a Key by Tag:</strong>
+The <code>get_key</code> function allows other smart contracts, applications, or users to query the registry by providing a tag (e.g., <code>alice.ccd</code>). The registry returns the associated public key and other relevant wallet information, such as the wallet provider and contract address.</p>
+</li>
+<li>
+<p><strong>Reverse Lookup (Getting a Tag by Key):</strong>
+The <code>get_tag</code> function performs a reverse lookup, where a public key is provided, and the associated tag is returned. This is useful in cases where a user or service only knows the public key but needs to find the human-readable tag.</p>
+</li>
+</ol>
+<h4 id="24-contract-structure-overview"><a class="header" href="#24-contract-structure-overview">2.4 Contract Structure Overview</a></h4>
+<p>The CIS5 wallet registry smart contract is divided into several components, each of which handles a specific part of the contract’s functionality. Here’s a high-level breakdown of the structure:</p>
+<ul>
+<li>
+<p><strong>State Definition:</strong>
+The contract maintains a <code>registry</code>, which is a mapping between tags and the associated wallet details. It also maintains a <code>lookup</code>, which is a reverse mapping that associates public keys with their registered tags. This ensures that both forward and reverse lookups are efficient.</p>
+</li>
+<li>
+<p><strong>Error Handling:</strong>
+The contract defines several custom error types, such as <code>TagAlreadyExists</code> and <code>TagDoesNotExist</code>, which handle invalid operations gracefully. For example, if a user tries to register a tag that has already been claimed, the contract returns the <code>TagAlreadyExists</code> error.</p>
+</li>
+<li>
+<p><strong>Signature Validation:</strong>
+Each operation is cryptographically secure, and the contract validates signatures to ensure that only the owner of a public key can register a tag or manage the associated wallet information. This prevents unauthorized users from tampering with the registry.</p>
+</li>
+<li>
+<p><strong>Event Logging:</strong>
+Events are logged for each action performed within the smart contract. For example, when a new tag is registered, an event is emitted with details about the tag and the associated public key. This allows external applications to track updates to the registry.</p>
+</li>
+</ul>
+<p>The following chapters will delve into each of these functions in greater detail, walking through the code and its logic. But before we move forward, let's discuss the technical environment where the contract operates: the Concordium blockchain.</p>
+<h4 id="25-why-concordium"><a class="header" href="#25-why-concordium">2.5 Why Concordium?</a></h4>
+<p>Concordium is a public, proof-of-stake blockchain with a strong focus on privacy and regulatory compliance. It offers several features that make it an ideal platform for deploying smart contracts, especially those related to wallet management.</p>
+<ul>
+<li>
+<p><strong>Privacy and Compliance:</strong> Concordium's built-in identity layer ensures that users maintain their privacy while complying with regulations. This is especially important for applications like wallet registries, where user data must be handled carefully.</p>
+</li>
+<li>
+<p><strong>Security:</strong> The blockchain uses highly secure cryptographic algorithms which forms the backbone of the CIS5 wallet standard. The smart contract relies on these cryptographic primitives to ensure that public keys and signatures are handled securely.</p>
+</li>
+<li>
+<p><strong>Efficiency:</strong> Concordium is designed to handle a high volume of transactions without sacrificing security or speed. This is crucial for scalability, where users will regularly query the network for information.</p>
+</li>
+</ul>
+<p>In the next chapter, we will explore the initialization process of the CIS5 wallet registry, walking through the contract’s deployment and initial setup.</p>
+<hr />
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="chapter_1.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="chapter_3.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="chapter_1.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="chapter_3.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Retrieving Tags and Public Keys - Concordium Smart Wallet Registry</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="overview.html">Overview</a></li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">2.</strong> Understanding the CIS5 Wallet Registry</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">3.</strong> Deploying and Initializing a Smart Contract</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">4.</strong> Registering Wallet Tags</a></li><li class="chapter-item expanded "><a href="chapter_5.html" class="active"><strong aria-hidden="true">5.</strong> Retrieving Tags and Public Keys</a></li><li class="chapter-item expanded "><a href="chapter_6.html"><strong aria-hidden="true">6.</strong> Security Considerations (Revised)</a></li><li class="chapter-item expanded "><a href="chapter_7.html"><strong aria-hidden="true">7.</strong> Interacting with the Registry</a></li><li class="chapter-item expanded "><a href="chapter_8.html"><strong aria-hidden="true">8.</strong> Real-World Applications</a></li><li class="chapter-item expanded "><a href="chapter_9.html"><strong aria-hidden="true">9.</strong> Conclusion</a></li><li class="chapter-item expanded affix "><a href="Contributors.html">Contributors</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Concordium Smart Wallet Registry</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h3 id="chapter-5-retrieving-tags-and-public-keys"><a class="header" href="#chapter-5-retrieving-tags-and-public-keys">Chapter 5: <strong>Retrieving Tags and Public Keys</strong></a></h3>
+<p>In the previous chapter, we explored how to register a wallet tag with a public key and associated contract information. Now, we’ll turn our attention to the retrieval process: how to query the registry to get the details of a tag or public key.</p>
+<p>The smart contract provides two essential functions for retrieval:</p>
+<ol>
+<li><strong><code>get_key</code></strong>: Retrieves the wallet details given a tag.</li>
+<li><strong><code>get_tag</code></strong>: Performs a reverse lookup to get the tag associated with a given public key.</li>
+</ol>
+<hr />
+<h4 id="51-retrieving-account-details-by-tag-get_key"><a class="header" href="#51-retrieving-account-details-by-tag-get_key">5.1 Retrieving Account Details by Tag: <code>get_key</code></a></h4>
+<p>Once a tag is registered, users or wallet providers may want to query the registry to get the public key and associated contract details for that tag. The function designed for this purpose is <code>get_key</code>.</p>
+<p>Here is the function definition:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[receive(
+    contract = "registry",
+    name = "get_key",
+    parameter = "String",
+    error = "Error",
+)]
+fn get_key(ctx: &amp;ReceiveContext, host: &amp;Host&lt;State&gt;) -&gt; RegistryResult&lt;Registry&gt; {
+    let mut tag: String = ctx.parameter_cursor().get()?;
+    if !tag.ends_with(".ccd") {
+        tag.push_str(".ccd");
+    }
+    host.state.get(tag)
+}
+<span class="boring">}</span></code></pre></pre>
+<h5 id="511-function-workflow"><a class="header" href="#511-function-workflow">5.1.1 Function Workflow</a></h5>
+<ol>
+<li>
+<p><strong>Parameter Parsing</strong>:</p>
+<ul>
+<li>The function accepts a tag as its input parameter, which is provided by the user or wallet provider.</li>
+<li>The contract first parses the input to retrieve the tag. If the tag does not already end with <code>.ccd</code>, the contract appends this suffix automatically to ensure the tag conforms to the CIS5 wallet standard.</li>
+</ul>
+</li>
+<li>
+<p><strong>Tag Lookup</strong>:</p>
+<ul>
+<li>After processing the tag, the contract checks its internal registry to find the details associated with the tag.</li>
+<li>It uses the <code>host.state.get(tag)</code> method to query the <code>State</code> map and retrieve the <code>Registry</code> object linked to the tag. If the tag is not found, the contract returns an error (<code>Error::TagDoesNotExist</code>).</li>
+</ul>
+</li>
+<li>
+<p><strong>Return</strong>:</p>
+<ul>
+<li>If the tag exists, the contract returns the corresponding <code>Registry</code> object, which includes:
+<ul>
+<li>The public key.</li>
+<li>The smart contract wallet address.</li>
+<li>The wallet provider.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h5 id="512-sample-usage-scenario"><a class="header" href="#512-sample-usage-scenario">5.1.2 Sample Usage Scenario</a></h5>
+<p>Consider a wallet provider that needs to send tokens to a user registered in the CIS5 wallet registry. Instead of asking the user for their public key and contract details, the provider can use the user’s tag (e.g., <code>"alice.ccd"</code>) to query the contract via <code>get_key</code>.</p>
+<p>For example, the provider could invoke the <code>get_key</code> function with the following input:</p>
+<pre><code class="language-json">"alice"
+</code></pre>
+<p>The contract would return:</p>
+<pre><code class="language-json">{
+    "public_key": "ed25519:9cf7b748...",
+    "contract_address": "ccd1qqx...",
+    "provider": "MyWalletApp"
+}
+</code></pre>
+<p>The provider can now send tokens to <code>"alice.ccd"</code> without requiring manual input from the user.</p>
+<hr />
+<h4 id="52-reverse-lookup-by-public-key-get_tag"><a class="header" href="#52-reverse-lookup-by-public-key-get_tag">5.2 Reverse Lookup by Public Key: <code>get_tag</code></a></h4>
+<p>In some cases, users or wallet providers might have a public key but not the corresponding tag. The <code>get_tag</code> function enables reverse lookup, allowing anyone to retrieve the tag associated with a given public key.</p>
+<p>Here’s the function definition:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[receive(
+    contract = "registry",
+    name = "get_tag",
+    parameter = "PublicKeyEd25519",
+    error = "Error",
+)]
+fn get_tag(ctx: &amp;ReceiveContext, host: &amp;Host&lt;State&gt;) -&gt; RegistryResult&lt;String&gt; {
+    let key: PublicKeyEd25519 = ctx.parameter_cursor().get()?;
+    host.state.get_tag(key)
+}
+<span class="boring">}</span></code></pre></pre>
+<h5 id="521-function-workflow"><a class="header" href="#521-function-workflow">5.2.1 Function Workflow</a></h5>
+<ol>
+<li>
+<p><strong>Parameter Parsing</strong>:</p>
+<ul>
+<li>The <code>get_tag</code> function accepts a public key as input, specifically of type <code>PublicKeyEd25519</code>.</li>
+<li>The contract parses this parameter from the input, ensuring the public key is correctly formatted.</li>
+</ul>
+</li>
+<li>
+<p><strong>Public Key Lookup</strong>:</p>
+<ul>
+<li>After extracting the public key, the contract checks its internal lookup table to see if there is a tag associated with this key.</li>
+<li>It uses the <code>host.state.get_tag(key)</code> method to perform this reverse lookup in the <code>lookup</code> map. If no tag exists for the public key, the contract returns an error (<code>Error::KeyDoesNotExist</code>).</li>
+</ul>
+</li>
+<li>
+<p><strong>Return</strong>:</p>
+<ul>
+<li>If the public key exists, the contract returns the tag associated with it, such as <code>"alice.ccd"</code>. This tag can then be used for further queries or transactions.</li>
+</ul>
+</li>
+</ol>
+<h5 id="522-sample-usage-scenario"><a class="header" href="#522-sample-usage-scenario">5.2.2 Sample Usage Scenario</a></h5>
+<p>Consider a scenario where a wallet provider has a user’s public key (<code>ed25519:9cf7b748...</code>) but does not know the associated tag. To simplify the transaction process, the provider can perform a reverse lookup using the <code>get_tag</code> function.</p>
+<p>The input would look like this:</p>
+<pre><code class="language-json">"ed25519:9cf7b748..."
+</code></pre>
+<p>The contract would return:</p>
+<pre><code class="language-json">"alice.ccd"
+</code></pre>
+<p>With the tag <code>"alice.ccd"</code>, the provider can then look up additional details or use it for transactions.</p>
+<hr />
+<h4 id="53-error-handling-in-retrieval"><a class="header" href="#53-error-handling-in-retrieval">5.3 Error Handling in Retrieval</a></h4>
+<p>Both <code>get_key</code> and <code>get_tag</code> functions include error handling mechanisms that return appropriate errors when a tag or public key is not found.</p>
+<ol>
+<li>
+<p><strong><code>Error::TagDoesNotExist</code></strong>:</p>
+<ul>
+<li>This error is triggered when a tag lookup fails, meaning the tag provided is not registered in the contract.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>Error::KeyDoesNotExist</code></strong>:</p>
+<ul>
+<li>This error occurs during reverse lookup when a public key is not found in the <code>lookup</code> map.</li>
+</ul>
+</li>
+</ol>
+<p>These errors help users and providers quickly identify issues and take corrective action, whether it’s rechecking the tag or public key, or informing the user that they need to register their wallet first.</p>
+<hr />
+<h3 id="chapter-summary"><a class="header" href="#chapter-summary">Chapter Summary</a></h3>
+<p>In this chapter, we’ve explored the two main retrieval functions of the CIS5 wallet registry:</p>
+<ul>
+<li><strong><code>get_key</code></strong>: Retrieves wallet details based on a tag.</li>
+<li><strong><code>get_tag</code></strong>: Performs a reverse lookup to retrieve the tag associated with a public key.</li>
+</ul>
+<p>These functions simplify asset transfers by removing the need for manual input and reducing the risk of errors. By utilizing the <code>.ccd</code> tag standard, wallet providers and users can securely and efficiently interact with the registry.</p>
+<p>In the next chapter, <strong>Chapter 6: Security Considerations</strong>, we’ll examine the security features of the contract, including signature verification and nonce management, and how they protect the integrity of the registry.</p>
+<hr />
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="chapter_4.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="chapter_6.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="chapter_4.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="chapter_6.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

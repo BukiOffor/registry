@@ -1,0 +1,345 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Deploying and Initializing a Smart Contract - Concordium Smart Wallet Registry</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="overview.html">Overview</a></li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">2.</strong> Understanding the CIS5 Wallet Registry</a></li><li class="chapter-item expanded "><a href="chapter_3.html" class="active"><strong aria-hidden="true">3.</strong> Deploying and Initializing a Smart Contract</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">4.</strong> Registering Wallet Tags</a></li><li class="chapter-item expanded "><a href="chapter_5.html"><strong aria-hidden="true">5.</strong> Retrieving Tags and Public Keys</a></li><li class="chapter-item expanded "><a href="chapter_6.html"><strong aria-hidden="true">6.</strong> Security Considerations (Revised)</a></li><li class="chapter-item expanded "><a href="chapter_7.html"><strong aria-hidden="true">7.</strong> Interacting with the Registry</a></li><li class="chapter-item expanded "><a href="chapter_8.html"><strong aria-hidden="true">8.</strong> Real-World Applications</a></li><li class="chapter-item expanded "><a href="chapter_9.html"><strong aria-hidden="true">9.</strong> Conclusion</a></li><li class="chapter-item expanded affix "><a href="Contributors.html">Contributors</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Concordium Smart Wallet Registry</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h3 id="chapter-3-deploying-and-initializing-a-smart-contract"><a class="header" href="#chapter-3-deploying-and-initializing-a-smart-contract">Chapter 3: <strong>Deploying and Initializing a Smart Contract</strong></a></h3>
+<p>In this chapter, we will walk through the deployment and initialization process of the CIS5 wallet registry smart contract on Concordium. Deploying a smart contract is the first crucial step in getting your registry up and running. We'll cover how to set up the contract state, register initial values, and ensure that the contract is prepared for interaction with external users and applications.</p>
+<p>By the end of this chapter, you’ll understand how to deploy the wallet registry on Concordium and how to initialize the contract with the necessary data structures.</p>
+<hr />
+<h4 id="31-understanding-the-smart-contract-lifecycle"><a class="header" href="#31-understanding-the-smart-contract-lifecycle">3.1 Understanding the Smart Contract Lifecycle</a></h4>
+<p>Smart contracts on Concordium follow a lifecycle that begins with deployment and ends when the contract is no longer in use. This lifecycle includes several key stages:</p>
+<ul>
+<li><strong>Initialization</strong>: This is where the contract’s state is created and any necessary parameters are set.</li>
+<li><strong>Interaction</strong>: Once deployed, the contract can be interacted with by users or other contracts, triggering specific functions.</li>
+<li><strong>State Management</strong>: As users interact with the contract, its state evolves, storing new information or updating existing entries.</li>
+</ul>
+<p>Before users can register their wallet tags, we need to deploy and initialize the contract, setting up the necessary structures for future interaction.</p>
+<h4 id="32-preparing-for-deployment"><a class="header" href="#32-preparing-for-deployment">3.2 Preparing for Deployment</a></h4>
+<p>Before deploying the contract, you need to have a working Concordium node or access to Concordium's smart contract development tools, such as:</p>
+<ul>
+<li><strong>Concordium Node</strong>: You can either run your own Concordium node or use a testnet node provided by the platform.</li>
+<li><strong>Concordium Client</strong>: The client is used to interact with the blockchain, deploy contracts, and manage transactions.</li>
+<li><strong>Development Environment</strong>: Make sure you have Rust and Concordium's smart contract SDK set up to compile and deploy the contract.</li>
+</ul>
+<p>The contract must be compiled to WebAssembly (Wasm) format before it can be deployed. The Wasm file will then be uploaded to the blockchain via the Concordium client.</p>
+<h4 id="33-compiling-the-smart-contract"><a class="header" href="#33-compiling-the-smart-contract">3.3 Compiling the Smart Contract</a></h4>
+<p>Once the contract is written, you need to compile it into a Wasm binary that can be deployed to Concordium. Here’s how you can do it:</p>
+<ol>
+<li>
+<p><strong>Navigate to the Contract Directory</strong>: Ensure that your contract code is in a directory with the necessary dependencies, such as <code>Cargo.toml</code> configured for smart contract development.</p>
+</li>
+<li>
+<p><strong>Compile the Contract</strong>: Use the following command to compile your contract to Wasm:</p>
+<pre><code class="language-bash">cargo concordium build
+</code></pre>
+<p>This command generates a <code>.wasm</code> file in the <code>target/wasm32-unknown-unknown/release</code> directory, which can then be deployed to Concordium.</p>
+</li>
+</ol>
+<h4 id="34-deploying-the-smart-contract"><a class="header" href="#34-deploying-the-smart-contract">3.4 Deploying the Smart Contract</a></h4>
+<p>Once the contract is compiled, it’s ready to be deployed to the blockchain. The Concordium client will handle the process of uploading the contract and executing the necessary transactions to make it available on-chain.</p>
+<p>Here’s the basic process:</p>
+<ol>
+<li>
+<p><strong>Upload the Wasm File</strong>: Use the following command to deploy the contract:</p>
+<pre><code class="language-bash">concordium-client module deploy &lt;path-to-wasm-file&gt; --sender &lt;sender-account&gt; --energy &lt;energy-limit&gt;
+</code></pre>
+<p>This command uploads the Wasm file and initializes the contract with the sender account.</p>
+</li>
+<li>
+<p><strong>Initialize the Contract</strong>: After the Wasm file is deployed, the contract needs to be initialized. In the case of the CIS5 wallet registry, we need to set up the <code>registry</code> and <code>lookup</code> mappings that store tags and public keys.</p>
+<p>The initialization function is defined as:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[init(contract = "registry")]
+fn init(_ctx: &amp;InitContext, state_builder: &amp;mut StateBuilder) -&gt; InitResult&lt;State&gt; {
+    Ok(State {
+        registry: state_builder.new_map(),
+        lookup: state_builder.new_map(),
+    })
+}
+<span class="boring">}</span></code></pre></pre>
+<p>When the <code>init</code> function is called, it sets up an empty <code>registry</code> (for tag-to-public-key mappings) and <code>lookup</code> (for public-key-to-tag reverse lookups). These data structures are necessary for the registry to function.</p>
+</li>
+<li>
+<p><strong>Command to Initialize</strong>:
+Use the following command to initialize the contract after deployment:</p>
+<pre><code class="language-bash">concordium-client contract init &lt;module-ref&gt; --init-function init --sender &lt;sender-account&gt; --energy &lt;energy-limit&gt;
+</code></pre>
+<p>This command initializes the contract, setting up its initial state.</p>
+</li>
+</ol>
+<p>Once initialized, the contract is ready to handle registrations, lookups, and interactions from users.</p>
+<h4 id="35-contract-state-setup"><a class="header" href="#35-contract-state-setup">3.5 Contract State Setup</a></h4>
+<p>At initialization, the contract’s state is defined by the <code>State</code> struct:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Serial, DeserialWithState)]
+#[concordium(state_parameter = "S")]
+pub struct State&lt;S = StateApi&gt; {
+    registry: StateMap&lt;String, Registry, S&gt;,
+    lookup: StateMap&lt;PublicKeyEd25519, String, S&gt;,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The <code>registry</code> and <code>lookup</code> are maps that store:</p>
+<ul>
+<li>
+<p><strong>Registry</strong>: A mapping from a string (the tag) to a <code>Registry</code> object. The <code>Registry</code> object includes details like the public key, contract address, and provider.</p>
+</li>
+<li>
+<p><strong>Lookup</strong>: A reverse lookup that maps a <code>PublicKeyEd25519</code> to the associated tag string.</p>
+</li>
+</ul>
+<p>The state is created during initialization by calling <code>state_builder.new_map()</code>, which sets up empty mappings for both <code>registry</code> and <code>lookup</code>. These mappings will be populated as users register their wallet tags through interactions with the contract.</p>
+<h4 id="36-initializing-with-test-data"><a class="header" href="#36-initializing-with-test-data">3.6 Initializing with Test Data</a></h4>
+<p>During the testing phase or deployment to a development environment, you may want to initialize the contract with some test data to verify its functionality. You can modify the initialization function to include a few example entries, like so:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[init(contract = "registry")]
+fn init(_ctx: &amp;InitContext, state_builder: &amp;mut StateBuilder) -&gt; InitResult&lt;State&gt; {
+    let mut registry = state_builder.new_map();
+    let mut lookup = state_builder.new_map();
+
+    // Example entry
+    let test_key = PublicKeyEd25519([1; 32]); // Example public key
+    let test_registry = Registry {
+        public_key: test_key,
+        contract_address: AccountAddress([2; 32]),
+        provider: "TestProvider".to_string(),
+    };
+
+    registry.insert("example.ccd".to_string(), test_registry.clone());
+    lookup.insert(test_key, "example.ccd".to_string());
+
+    Ok(State {
+        registry,
+        lookup,
+    })
+}
+<span class="boring">}</span></code></pre></pre>
+<p>In this example, we pre-register a tag (<code>example.ccd</code>) and its associated public key, contract address, and provider. This allows for easier testing and validation of the contract’s functionality.</p>
+<h4 id="37-finalizing-deployment"><a class="header" href="#37-finalizing-deployment">3.7 Finalizing Deployment</a></h4>
+<p>After initialization, the contract is live on the Concordium blockchain and ready for interaction. Users and other contracts can now register tags, retrieve public keys, and perform reverse lookups. Each transaction will update the contract’s state and emit events, which can be tracked for auditing purposes.</p>
+<hr />
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="chapter_2.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="chapter_4.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="chapter_2.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="chapter_4.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
