@@ -211,7 +211,7 @@ fn contract_get_register_message_hash(
     enable_logger,
     mutable
 )]
-fn withdraw_ccd(
+fn register(
     ctx: &ReceiveContext,
     host: &mut Host<State>,
     logger: &mut Logger,
